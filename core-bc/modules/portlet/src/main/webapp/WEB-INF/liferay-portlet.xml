@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<!DOCTYPE liferay-portlet-app PUBLIC "-//Liferay//DTD Portlet Application 6.0.0//EN" "http://www.liferay.com/dtd/liferay-portlet-app_6_0_0.dtd">
+
+<liferay-portlet-app>
+  <portlet>
+    <portlet-name>MobileIcon</portlet-name>
+    <preferences-unique-per-layout>true</preferences-unique-per-layout>
+    <action-url-redirect>true</action-url-redirect>
+    <maximize-edit>true</maximize-edit>
+    <instanceable>true</instanceable>
+  </portlet>
+</liferay-portlet-app>
