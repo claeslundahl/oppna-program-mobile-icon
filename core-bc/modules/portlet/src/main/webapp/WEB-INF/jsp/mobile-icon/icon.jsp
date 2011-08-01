@@ -19,6 +19,39 @@
     A:hover {
         text-decoration: none;
     }
+
+    .mobile-icon {
+        height: 150px;
+        width: 150px;
+    }
+    #overlay {
+        width: 40px;
+        height: 40px;
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        z-index: 0;
+    }
+
+    .stretch {
+        width: 100%;
+        height: 100%;
+    }
+
+    #quick-message {
+        height: 100%;
+        left: 0px;
+        line-height: 40px;
+        position: absolute;
+        text-align: center;
+        width: 100%;
+        border: solid 1px;
+        border-radius: 20px 20px 20px 20px;
+        -moz-border-radius: 15px;
+        -webkit-border-radius: 15px;
+        background-color: #ffffff;
+    }
+
 </style>
 
 <portlet:actionURL var="showWidget">
@@ -32,10 +65,10 @@
             <a href="${targetUrl}" target="_blank" style="text-decoration: none; ">
                 <c:choose>
                     <c:when test="${not empty imageId}">
-                        <img src="/image/image_gallery?img_id=${imageId}" />
+                        <img class="mobile-icon" src="/image/image_gallery?img_id=${imageId}"/>
                     </c:when>
                     <c:otherwise>
-                        <img src="${pageContext.request.contextPath}/images/not_found.jpg" />
+                        <img class="mobile-icon" src="${pageContext.request.contextPath}/images/not_found.jpg"/>
                     </c:otherwise>
                 </c:choose>
                 <div style="text-decoration: none">${title}</div>
@@ -45,14 +78,18 @@
             <a href="${showWidget}" style="text-decoration: none; ">
                 <c:choose>
                     <c:when test="${not empty imageId}">
-                        <img src="/image/image_gallery?img_id=${imageId}" />
+                        <img class="mobile-icon" src="/image/image_gallery?img_id=${imageId}"/>
                     </c:when>
                     <c:otherwise>
-                        <img src="${pageContext.request.contextPath}/images/not_found.jpg" />
+                        <img class="mobile-icon" src="${pageContext.request.contextPath}/images/not_found.jpg"/>
                     </c:otherwise>
                 </c:choose>
-                <div style="text-decoration: none">${title}</div>
+                <div style=";text-decoration: none">${title}</div>
             </a>
         </c:otherwise>
     </c:choose>
+</div>
+<div id="overlay">
+    <img src="${pageContext.request.contextPath}/images/500px-circle.pngdd" class="stretch"/>
+    <span id="quick-message">15</span>
 </div>

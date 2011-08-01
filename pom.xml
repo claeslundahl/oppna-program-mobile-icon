@@ -26,8 +26,8 @@
   <!--NB! SCM config below assumes system name equals VGR subversion/googlecode project name! -->
   <!-- Open Source repo -->
   <scm>
-    <developerConnection>scm:svn:https://mobile-icon.googlecode.com/svn/trunk</developerConnection>
-    <url>http://mobile-icon.googlecode.com/svn/trunk</url>
+    <developerConnection>scm:svn:https://oppna-program-mobile-icon.googlecode.com/svn/trunk</developerConnection>
+    <url>http://oppna-program-mobile-icon.googlecode.com/svn/trunk</url>
   </scm>
 
 </project>
