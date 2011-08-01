@@ -27,9 +27,9 @@
     #overlay {
         width: 40px;
         height: 40px;
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
+        position: relative;
+        left: 120px;
+        top: -60px;
         z-index: 0;
     }
 
@@ -47,9 +47,15 @@
         width: 100%;
         border: solid 1px;
         border-radius: 20px 20px 20px 20px;
-        -moz-border-radius: 15px;
-        -webkit-border-radius: 15px;
+        -moz-border-radius: 20px;
+        -webkit-border-radius: 20px;
         background-color: #ffffff;
+    }
+
+    .title-text {
+        text-decoration: none;
+        width:150px;
+        text-align: center;
     }
 
 </style>
@@ -58,7 +64,7 @@
     <portlet:param name="action" value="showWidget"/>
 </portlet:actionURL>
 
-<div style="text-align: center;">
+<div style="text-align: left;">
 
     <c:choose>
         <c:when test="${target eq 'url'}">
@@ -71,7 +77,7 @@
                         <img class="mobile-icon" src="${pageContext.request.contextPath}/images/not_found.jpg"/>
                     </c:otherwise>
                 </c:choose>
-                <div style="text-decoration: none">${title}</div>
+                <div class="title-text" >${title}</div>
             </a>
         </c:when>
         <c:otherwise>
@@ -84,12 +90,11 @@
                         <img class="mobile-icon" src="${pageContext.request.contextPath}/images/not_found.jpg"/>
                     </c:otherwise>
                 </c:choose>
-                <div style=";text-decoration: none">${title}</div>
+                <div class="title-text">${title}</div>
             </a>
         </c:otherwise>
     </c:choose>
 </div>
 <div id="overlay">
-    <img src="${pageContext.request.contextPath}/images/500px-circle.pngdd" class="stretch"/>
     <span id="quick-message">15</span>
 </div>
