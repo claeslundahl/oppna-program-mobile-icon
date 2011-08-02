@@ -11,6 +11,7 @@
         ">
 
   <import resource="classpath*:spring/mobile-icon-*.xml"/>
+  <import resource="classpath*:META-INF/spring/messagebus-counter-routes.xml"/>
 
   <!-- Enable annotation driven controllers, validation etc... -->
   <mvc:resources mapping="/resources/**" location="classpath:/**"/>
