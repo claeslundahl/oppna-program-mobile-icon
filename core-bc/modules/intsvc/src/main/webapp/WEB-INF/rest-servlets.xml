@@ -14,14 +14,13 @@
 
   <jaxrs:server id="testServer" address="/">
     <jaxrs:serviceBeans>
-      <ref bean="testService"/>
+      <ref bean="testCounter"/>
     </jaxrs:serviceBeans>
     <jaxrs:providers>
       <bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
     </jaxrs:providers>
   </jaxrs:server>
 
-  <bean id="testService" class="se.vgregion.mobileicon.service.TestCounter">
-  </bean>
+  <bean id="testCounter" class="se.vgregion.mobileicon.service.TestCounter" />
 
 </beans>
