@@ -1,5 +1,8 @@
 package se.vgregion.mobileicon.controller;
 
+import com.liferay.portal.kernel.messaging.Message;
+import com.liferay.portal.kernel.messaging.MessageBusException;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,6 +43,19 @@ public class MobileIconController {
 
         model.addAttribute("title", title);
         model.addAttribute("imageId", imageId);
+
+        Message message = new Message();
+        message.setPayload("");
+
+        Object response = null;
+        try {
+            response = MessageBusUtil.sendSynchronousMessage("vgr/test-counter", message, 7000);
+        } catch (MessageBusException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+//        return ControllerUtil.extractResponse(response, createUserJaxbUtil);
+
 
         return "icon";
     }
