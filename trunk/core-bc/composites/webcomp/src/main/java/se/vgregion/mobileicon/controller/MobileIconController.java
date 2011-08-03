@@ -49,7 +49,10 @@ public class MobileIconController {
 
         Object response = null;
         try {
-            response = MessageBusUtil.sendSynchronousMessage("vgr/test-counter", message, 7000);
+            response = MessageBusUtil.sendSynchronousMessage("vgr/test_counter", message, 7000);
+            if (response instanceof Exception) {
+                throw new RuntimeException((Exception)response);
+            }
         } catch (MessageBusException e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
