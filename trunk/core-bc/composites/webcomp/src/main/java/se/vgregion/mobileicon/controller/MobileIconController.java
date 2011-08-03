@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
+import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
 import javax.portlet.*;
 
@@ -33,6 +34,7 @@ public class MobileIconController {
 
         String imageId = preferences.getValue("imageId", null);
         String title = preferences.getValue("title", "untitled");
+        String counterService = preferences.getValue("counterService", null);
 
         String target = preferences.getValue("target", "url");
         model.addAttribute("target", target);
@@ -44,23 +46,31 @@ public class MobileIconController {
         model.addAttribute("title", title);
         model.addAttribute("imageId", imageId);
 
+        if (counterService != null) {
+            model.addAttribute("count", getCount(counterService, 300));
+        }
+
+        return "icon";
+    }
+
+    @ResourceMapping()
+    public String getCount(String counterService) {
+        return getCount(counterService, 2000);
+    }
+
+    private String getCount(String counterService, int timeoutMillis) {
         Message message = new Message();
-        message.setPayload("");
+        message.setPayload(" ");
 
         Object response = null;
         try {
-            response = MessageBusUtil.sendSynchronousMessage("vgr/test_counter", message, 7000);
-            if (response instanceof Exception) {
-                throw new RuntimeException((Exception)response);
-            }
-        } catch (MessageBusException e) {
+            response = MessageBusUtil.sendSynchronousMessage(counterService, message, timeoutMillis);
+        } catch (Exception e) {
             e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            response = "-";
         }
 
-//        return ControllerUtil.extractResponse(response, createUserJaxbUtil);
-
-
-        return "icon";
+        return response.toString();
     }
 
     @ActionMapping(params = "action=showWidget")
