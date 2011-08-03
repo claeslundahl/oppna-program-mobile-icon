@@ -18,8 +18,21 @@ public class TestCounter {
     @POST
     @Produces("application/json")
     public String getRandom() {
+        String msg = get();
+        System.out.println("POST: "+msg);
+        return msg;
+    }
+
+    @GET
+    @Produces("application/json")
+    public String random() {
+        String msg = get();
+        System.out.println("GET: "+msg);
+        return msg;
+    }
+
+    private String get() {
         Random random = new Random();
         return random.nextInt(100) + "";
     }
-
 }
