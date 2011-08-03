@@ -13,11 +13,20 @@
 
     <routeBuilder ref="testCounterRoutes"/>
 
+    <routeBuilder ref="testCounterRoutes2"/>
+
   </camelContext>
 
 
   <bean id="testCounterRoutes" class="se.vgregion.routes.MessagebusRestRouteBuilder">
     <constructor-arg index="0" value="${test.counter.messagebus.destination}"/>
+    <constructor-arg index="1" value="${test.counter.rest.destination}"/>
+    <constructor-arg index="2" value="GET" />
+    <constructor-arg index="3" value="application/json" />
+  </bean>
+
+  <bean id="testCounterRoutes2" class="se.vgregion.routes.MessagebusRestRouteBuilder">
+    <constructor-arg index="0" value="vgr/counter_test2"/>
     <constructor-arg index="1" value="${test.counter.rest.destination}"/>
     <constructor-arg index="2" value="GET" />
     <constructor-arg index="3" value="application/json" />
