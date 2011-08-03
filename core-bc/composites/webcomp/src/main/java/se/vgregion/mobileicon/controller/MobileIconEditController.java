@@ -20,10 +20,7 @@ import sun.reflect.Reflection;
 import javax.portlet.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * User: pabe
@@ -59,14 +56,14 @@ public class MobileIconEditController {
         model.addAttribute("widgetScript", widgetScript);
         model.addAttribute("counterService", counterService);
 
+        Collection<String> result = new ArrayList();
         Collection<String> mbDestinations = MessageBusUtil.getMessageBus().getDestinationNames();
-        for (Iterator<String> it = mbDestinations.iterator(); it.hasNext(); ) {
-            String destination = it.next();
-            if (!destination.startsWith("vgr/counter")) {
-                it.remove();
+        for (String destination : mbDestinations) {
+            if (destination.startsWith("vgr/counter")) {
+                result.add(destination);
             }
         }
-        model.addAttribute("allCounterServices", mbDestinations);
+        model.addAttribute("allCounterServices", result);
 
         return "edit";
     }
