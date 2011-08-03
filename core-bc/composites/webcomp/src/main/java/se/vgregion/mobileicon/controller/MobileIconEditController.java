@@ -1,6 +1,7 @@
 package se.vgregion.mobileicon.controller;
 
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
@@ -20,6 +21,8 @@ import javax.portlet.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -37,6 +40,7 @@ public class MobileIconEditController {
     private String targetUrl;
     private String target;
     private String widgetScript;
+    private String counterService;
 
     @RenderMapping
     public String edit(RenderRequest request, Model model) {
@@ -46,12 +50,23 @@ public class MobileIconEditController {
         String targetUrl = fetchField("targetUrl", request);
         String target = fetchField("target", request);
         String widgetScript = fetchField("widgetScript", request);
+        String counterService = fetchField("counterService", request);
 
         model.addAttribute("title", title);
         model.addAttribute("imageId", imageId);
         model.addAttribute("targetUrl", targetUrl);
         model.addAttribute("target", target);
         model.addAttribute("widgetScript", widgetScript);
+        model.addAttribute("counterService", counterService);
+
+        Collection<String> mbDestinations = MessageBusUtil.getMessageBus().getDestinationNames();
+        for (Iterator<String> it = mbDestinations.iterator(); it.hasNext(); ) {
+            String destination = it.next();
+            if (!destination.startsWith("vgr/counter")) {
+                it.remove();
+            }
+        }
+        model.addAttribute("allCounterServices", mbDestinations);
 
         return "edit";
     }
@@ -106,11 +121,13 @@ public class MobileIconEditController {
         String targetUrl = request.getParameter("targetUrl");
         String target = request.getParameter("target");
         String widgetScript = request.getParameter("widgetScript");
+        String counterService = request.getParameter("counterService");
 
         this.title = title;
         this.targetUrl = targetUrl;
         this.target = target;
         this.widgetScript = widgetScript;
+        this.counterService = counterService;
 
         response.setRenderParameter("action", "editIconUrl");
     }
@@ -131,6 +148,7 @@ public class MobileIconEditController {
         String imageId = request.getParameter("imageId");
         String target = request.getParameter("target");
         String widgetScript = request.getParameter("widgetScript");
+        String counterService = request.getParameter("counterService");
 
         PortletPreferences preferences = request.getPreferences();
         preferences.setValue("title", title);
@@ -138,6 +156,7 @@ public class MobileIconEditController {
         preferences.setValue("targetUrl", targetUrl);
         preferences.setValue("target", target);
         preferences.setValue("widgetScript", widgetScript);
+        preferences.setValue("counterService", counterService);
         preferences.store();
 
         response.setPortletMode(PortletMode.VIEW);
@@ -151,6 +170,7 @@ public class MobileIconEditController {
         this.targetUrl = null;
         this.target = null;
         this.widgetScript = null;
+        this.counterService = null;
 
         response.setPortletMode(PortletMode.VIEW);
     }
