@@ -100,7 +100,24 @@
                         </td>
                     </tr>
                 </table>
-
+            </tr>
+            <tr class="even-row">
+                <td><b>Räknare:</b></td>
+                <td>
+                    <select name="counterService">
+                        <option label="- Ingen räknare existerar -" value=""/>
+                        <c:forEach items="${allCounterServices}" var="counter">
+                            <c:choose>
+                                <c:when test="${counter eq counterService}">
+                                    <option label="${counter}" value="${counter}" selected="selected" />
+                                </c:when>
+                                <c:otherwise>
+                                    <option label="${counter}" value="${counter}" />
+                                </c:otherwise>
+                            </c:choose>
+                        </c:forEach>
+                    </select>
+                </td>
             </tr>
         </table>
         <div style="padding: 7px; ">
