@@ -56,7 +56,7 @@ public class MobileIconEditController {
         model.addAttribute("widgetScript", widgetScript);
         model.addAttribute("counterService", counterService);
 
-        Collection<String> result = new ArrayList();
+        Collection<String> result = new TreeSet();
         Collection<String> mbDestinations = MessageBusUtil.getMessageBus().getDestinationNames();
         for (String destination : mbDestinations) {
             if (destination.startsWith("vgr/counter")) {
