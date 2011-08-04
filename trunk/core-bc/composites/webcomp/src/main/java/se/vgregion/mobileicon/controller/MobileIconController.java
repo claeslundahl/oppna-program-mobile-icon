@@ -78,7 +78,11 @@ public class MobileIconController {
             response = "-";
         }
 
-        return response.toString();
+        if (response != null) {
+            return response.toString();
+        } else {
+            return "-";
+        }
     }
 
     @ActionMapping(params = "action=showWidget")
