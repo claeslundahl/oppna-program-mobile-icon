@@ -39,7 +39,7 @@
         height: 100%;
     }
 
-    #quick-message {
+    #<portlet:namespace/>quick-message {
         height: 100%;
         left: 0px;
         line-height: 40px;
@@ -100,14 +100,14 @@
     </c:choose>
 </div>
 <div id="overlay">
-    <span id="quick-message">${count}</span>
+    <span id="<portlet:namespace/>quick-message">${count}</span>
 </div>
 
 <script type="text/javascript">
 
-    var quickMessageSpan = document.getElementById("quick-message");
+    var <portlet:namespace/>quickMessageSpan = document.getElementById("<portlet:namespace/>quick-message");
 
-    function updateCounter() {
+    function <portlet:namespace/>updateCounter() {
         AUI().use('aui-io-request', function(A) {
             var url = "${fetchCount}";
             A.io.request(url, {
@@ -118,17 +118,17 @@
                         var responseValue = this.get('responseData');
                         responseValue = responseValue.toString()
                         responseValue = responseValue.substring(0, 6);
-                        quickMessageSpan.innerHTML = responseValue;
+                        <portlet:namespace/>quickMessageSpan.innerHTML = responseValue;
                     }
                 }
             });
         });
     }
 
-    if (quickMessageSpan.innerHTML == "-") {
-        updateCounter();
-        setInterval("updateCounter()", 10000); //10000 should be increased later
+    if (<portlet:namespace/>quickMessageSpan.innerHTML == "-") {
+        <portlet:namespace/>updateCounter();
+        setInterval("<portlet:namespace/>updateCounter()", 10000); //10000 should be increased later
     } else {
-        setInterval("updateCounter()", 10000);
+        setInterval("<portlet:namespace/>updateCounter()", 10000);
     }
 </script>
