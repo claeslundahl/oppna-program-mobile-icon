@@ -24,6 +24,7 @@
         height: 150px;
         width: 150px;
     }
+
     #overlay {
         width: 40px;
         height: 40px;
@@ -54,7 +55,7 @@
 
     .title-text {
         text-decoration: none;
-        width:150px;
+        width: 150px;
         text-align: center;
     }
 
@@ -63,6 +64,9 @@
 <portlet:actionURL var="showWidget">
     <portlet:param name="action" value="showWidget"/>
 </portlet:actionURL>
+<portlet:resourceURL var="fetchCount">
+
+</portlet:resourceURL>
 
 <div style="text-align: left;">
 
@@ -77,7 +81,7 @@
                         <img class="mobile-icon" src="${pageContext.request.contextPath}/images/not_found.jpg"/>
                     </c:otherwise>
                 </c:choose>
-                <div class="title-text" >${title}</div>
+                <div class="title-text">${title}</div>
             </a>
         </c:when>
         <c:otherwise>
@@ -96,5 +100,35 @@
     </c:choose>
 </div>
 <div id="overlay">
-    <span id="quick-message">15</span>
+    <span id="quick-message">${count}</span>
 </div>
+
+<script type="text/javascript">
+
+    var quickMessageSpan = document.getElementById("quick-message");
+
+    function updateCounter() {
+        AUI().use('aui-io-request', function(A) {
+            var url = "${fetchCount}";
+            A.io.request(url, {
+                dataType: 'json',
+                method: 'GET',
+                on: {
+                    success : function() {
+                        var responseValue = this.get('responseData');
+                        responseValue = responseValue.toString()
+                        responseValue = responseValue.substring(0, 6);
+                        quickMessageSpan.innerHTML = responseValue;
+                    }
+                }
+            });
+        });
+    }
+
+    if (quickMessageSpan.innerHTML == "-") {
+        updateCounter();
+        setInterval("updateCounter()", 10000); //10000 should be increased later
+    } else {
+        setInterval("updateCounter()", 10000);
+    }
+</script>

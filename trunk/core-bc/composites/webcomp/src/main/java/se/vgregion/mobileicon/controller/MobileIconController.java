@@ -12,6 +12,8 @@ import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
 
 import javax.portlet.*;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * User: pabe
@@ -54,8 +56,14 @@ public class MobileIconController {
     }
 
     @ResourceMapping()
-    public String getCount(String counterService) {
-        return getCount(counterService, 2000);
+    public void getCount(ResourceRequest request, ResourceResponse response) throws IOException {
+        PortletPreferences preferences = request.getPreferences();
+        String counterService = preferences.getValue("counterService", null);
+        if (counterService != null) {
+            PrintWriter writer = response.getWriter();
+            writer.write(getCount(counterService, 2000));
+            writer.close();
+        }
     }
 
     private String getCount(String counterService, int timeoutMillis) {
@@ -66,7 +74,7 @@ public class MobileIconController {
         try {
             response = MessageBusUtil.sendSynchronousMessage(counterService, message, timeoutMillis);
         } catch (Exception e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            e.printStackTrace();
             response = "-";
         }
 
@@ -85,7 +93,7 @@ public class MobileIconController {
         PortletPreferences preferences = request.getPreferences();
         String widgetScript = preferences.getValue("widgetScript", "");
         model.addAttribute("widgetScript", widgetScript);
-        
+
         return "widget";
     }
 }
