@@ -7,7 +7,7 @@
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
-  <import resource="messagebus-common.xml" />
+  <import resource="messagebus-common.xml"/>
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
 
@@ -15,21 +15,29 @@
 
     <routeBuilder ref="testCounterRoutes2"/>
 
+    <routeBuilder ref="testBean"/>
+
   </camelContext>
 
 
   <bean id="testCounterRoutes" class="se.vgregion.routes.MessagebusRestRouteBuilder">
     <constructor-arg index="0" value="${test.counter.messagebus.destination}"/>
     <constructor-arg index="1" value="${test.counter.rest.destination}"/>
-    <constructor-arg index="2" value="GET" />
-    <constructor-arg index="3" value="application/json" />
+    <constructor-arg index="2" value="GET"/>
+    <constructor-arg index="3" value="application/json"/>
   </bean>
 
   <bean id="testCounterRoutes2" class="se.vgregion.routes.MessagebusRestRouteBuilder">
     <constructor-arg index="0" value="vgr/counter_test2"/>
     <constructor-arg index="1" value="${test.counter.rest.destination}"/>
-    <constructor-arg index="2" value="GET" />
-    <constructor-arg index="3" value="application/json" />
+    <constructor-arg index="2" value="GET"/>
+    <constructor-arg index="3" value="application/json"/>
+  </bean>
+
+  <bean id="testBean" class="se.vgregion.routes.MessagebusBeanRouteBuilder">
+    <constructor-arg index="0" value="vgr/counter_bean"/>
+    <constructor-arg index="1" value="se.vgregion.test.RandomBean" />
+    <constructor-arg index="2" value="getRandom" />
   </bean>
 
   <!-- Destinations -->
