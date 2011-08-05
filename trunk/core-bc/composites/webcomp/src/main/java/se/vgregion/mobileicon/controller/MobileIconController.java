@@ -4,6 +4,8 @@ import com.liferay.portal.kernel.messaging.Message;
 import com.liferay.portal.kernel.messaging.MessageBusException;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +27,8 @@ import java.io.PrintWriter;
 @RequestMapping(value = "VIEW")
 public class MobileIconController {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MobileIconController.class);
+
     @ActionMapping
     public void defaultView(ActionResponse response) throws WindowStateException {
         response.setRenderParameter("p_p_state", "normal");
@@ -37,6 +41,7 @@ public class MobileIconController {
         String imageId = preferences.getValue("imageId", null);
         String title = preferences.getValue("title", "untitled");
         String counterService = preferences.getValue("counterService", null);
+        String updateInterval = preferences.getValue("updateInterval", "100000000");
 
         String target = preferences.getValue("target", "url");
         model.addAttribute("target", target);
@@ -51,11 +56,13 @@ public class MobileIconController {
         if (counterService != null) {
             model.addAttribute("count", getCount(counterService, 300));
         }
+        
+        model.addAttribute("updateInterval", updateInterval);
 
         return "icon";
     }
 
-    @ResourceMapping()
+    @ResourceMapping
     public void getCount(ResourceRequest request, ResourceResponse response) throws IOException {
         PortletPreferences preferences = request.getPreferences();
         String counterService = preferences.getValue("counterService", null);
@@ -70,11 +77,11 @@ public class MobileIconController {
         Message message = new Message();
         message.setPayload(" ");
 
-        Object response = null;
+        Object response;
         try {
             response = MessageBusUtil.sendSynchronousMessage(counterService, message, timeoutMillis);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("No response.", e);
             response = "-";
         }
 
