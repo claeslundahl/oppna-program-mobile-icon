@@ -127,8 +127,8 @@
 
     if (<portlet:namespace/>quickMessageSpan.innerHTML == "-") {
         <portlet:namespace/>updateCounter();
-        setInterval("<portlet:namespace/>updateCounter()", 10000); //10000 should be increased later
+        setInterval("<portlet:namespace/>updateCounter()", ${updateInterval * 1000});
     } else {
-        setInterval("<portlet:namespace/>updateCounter()", 10000);
+        setInterval("<portlet:namespace/>updateCounter()", ${updateInterval * 1000});
     }
 </script>

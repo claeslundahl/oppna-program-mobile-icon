@@ -59,10 +59,11 @@
                         </c:choose>
                     </a>
                     <script type="text/javascript">
+                        //This script snippet makes the surrounding form submit, meaning that we can save all input
+                        //values to when we come back from "editIconUrl". If javascript is enabled we can still edit
+                        //the icon url but then we will lose unsaved input values.
                         function editIcon() {
-                            console.log("editIcon");
                             var form = document.getElementById("<portlet:namespace/>editForm");
-                            console.log(form);
                             form.action = "${editIconUrl}";
                             form.submit();
 
@@ -70,53 +71,52 @@
                         }
 
                         var anchorTag = document.getElementById("editIconAnchor");
-                        console.log("anchorTag " + anchorTag);
                         anchorTag.onclick = editIcon;
                     </script>
 
                 </td>
             </tr>
             <tr class="even-row">
-                <table>
-                    <tr>
-                        <td><% System.out.println("target: " + request.getParameter("target") + " - " + request.getAttribute("target")); %>
-                            <input type="radio" name="target" value="url" ${target eq 'url' ? "checked='checked'" : ''}>
-                        </td>
-                        <td><b>Mål-URL:</b></td>
-                        <td>
-                            <input type="text" name="targetUrl" value="${targetUrl}">
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <input type="radio" name="target"
-                                   value="widget" ${target eq 'widget' ? "checked='checked'" : ''}>
-                        </td>
-                        <td><b>Widget-skript:</b></td>
-                        <td>
-                            <textarea rows="8" cols="40" name="widgetScript"><c:out escapeXml="true"
-                                                                                    value="${widgetScript}"></c:out></textarea>
-
-                        </td>
-                    </tr>
-                </table>
+                <td>
+                    <input type="radio" name="target"
+                           value="url" ${target eq 'url' ? "checked='checked'" : ''}>
+                    <b>Mål-URL:</b></td>
+                <td>
+                    <input type="text" name="targetUrl" value="${targetUrl}">
+                </td>
             </tr>
-            <tr class="even-row">
+            <tr>
+                <td>
+                    <input type="radio" name="target"
+                           value="widget" ${target eq 'widget' ? "checked='checked'" : ''}>
+                    <b>Widget-skript:</b></td>
+                <td>
+                    <textarea rows="8" cols="40" name="widgetScript"><c:out escapeXml="true"
+                                                                            value="${widgetScript}"></c:out></textarea>
+                </td>
+            </tr>
+            <tr class="odd-row">
                 <td><b>Räknare:</b></td>
                 <td>
                     <select name="counterService">
-                        <option label="- Ingen räknare existerar -" value=""/>
+                        <option value="">- Ingen räknare existerar -</option>
                         <c:forEach items="${allCounterServices}" var="counter">
                             <c:choose>
                                 <c:when test="${counter eq counterService}">
-                                    <option label="${counter}" value="${counter}" selected="selected" />
+                                    <option value="${counter}" selected="selected">${counter}</option>
                                 </c:when>
                                 <c:otherwise>
-                                    <option label="${counter}" value="${counter}" />
+                                    <option value="${counter}">${counter}</option>
                                 </c:otherwise>
                             </c:choose>
                         </c:forEach>
                     </select>
+                </td>
+            </tr>
+            <tr class="even-row">
+                <td><b>Uppdateringsintervall<br/> räknare (s):</b></td>
+                <td>
+                    <input type="text" name="updateInterval" value="${updateInterval}">
                 </td>
             </tr>
         </table>

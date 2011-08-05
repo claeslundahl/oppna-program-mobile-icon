@@ -15,10 +15,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
-import sun.reflect.Reflection;
 
 import javax.portlet.*;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.*;
 
@@ -30,7 +30,7 @@ import java.util.*;
 @Controller
 @RequestMapping(value = "EDIT")
 @Scope(value = "session")
-public class MobileIconEditController {
+public class MobileIconEditController implements Serializable {
 
     private String title;
     private String imageId;
@@ -38,6 +38,7 @@ public class MobileIconEditController {
     private String target;
     private String widgetScript;
     private String counterService;
+    private String updateInterval;
 
     @RenderMapping
     public String edit(RenderRequest request, Model model) {
@@ -48,6 +49,7 @@ public class MobileIconEditController {
         String target = fetchField("target", request);
         String widgetScript = fetchField("widgetScript", request);
         String counterService = fetchField("counterService", request);
+        String updateInterval = fetchField("updateInterval", request);
 
         model.addAttribute("title", title);
         model.addAttribute("imageId", imageId);
@@ -55,6 +57,7 @@ public class MobileIconEditController {
         model.addAttribute("target", target);
         model.addAttribute("widgetScript", widgetScript);
         model.addAttribute("counterService", counterService);
+        model.addAttribute("updateInterval", updateInterval);
 
         Collection<String> result = new TreeSet();
         Collection<String> mbDestinations = MessageBusUtil.getMessageBus().getDestinationNames();
@@ -119,12 +122,14 @@ public class MobileIconEditController {
         String target = request.getParameter("target");
         String widgetScript = request.getParameter("widgetScript");
         String counterService = request.getParameter("counterService");
+        String updateInterval = request.getParameter("updateInterval");
 
         this.title = title;
         this.targetUrl = targetUrl;
         this.target = target;
         this.widgetScript = widgetScript;
         this.counterService = counterService;
+        this.updateInterval = updateInterval;
 
         response.setRenderParameter("action", "editIconUrl");
     }
@@ -146,6 +151,7 @@ public class MobileIconEditController {
         String target = request.getParameter("target");
         String widgetScript = request.getParameter("widgetScript");
         String counterService = request.getParameter("counterService");
+        String updateInterval = request.getParameter("updateInterval");
 
         PortletPreferences preferences = request.getPreferences();
         preferences.setValue("title", title);
@@ -154,7 +160,10 @@ public class MobileIconEditController {
         preferences.setValue("target", target);
         preferences.setValue("widgetScript", widgetScript);
         preferences.setValue("counterService", counterService);
+        preferences.setValue("updateInterval", updateInterval);
         preferences.store();
+
+        resetFields();
 
         response.setPortletMode(PortletMode.VIEW);
         response.setWindowState(LiferayWindowState.NORMAL);
@@ -162,14 +171,19 @@ public class MobileIconEditController {
 
     @ActionMapping(params = {"action=cancel"})
     public void cancel(ActionResponse response) throws PortletModeException {
+        resetFields();
+
+        response.setPortletMode(PortletMode.VIEW);
+    }
+
+    private void resetFields() {
         this.title = null;
         this.imageId = null;
         this.targetUrl = null;
         this.target = null;
         this.widgetScript = null;
         this.counterService = null;
-
-        response.setPortletMode(PortletMode.VIEW);
+        this.updateInterval = null;
     }
 
 }
