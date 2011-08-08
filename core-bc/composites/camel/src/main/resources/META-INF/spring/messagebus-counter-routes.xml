@@ -17,6 +17,8 @@
 
     <routeBuilder ref="testBean"/>
 
+    <routeBuilder ref="testEcho"/>
+
   </camelContext>
 
 
@@ -39,6 +41,13 @@
     <constructor-arg index="1" value="se.vgregion.test.RandomBean" />
     <constructor-arg index="2" value="getRandom" />
   </bean>
+
+  <bean id="testEcho" class="se.vgregion.routes.MessagebusBeanRouteBuilder">
+    <constructor-arg index="0" value="vgr/counter_echo"/>
+    <constructor-arg index="1" value="se.vgregion.test.EchoBean" />
+    <constructor-arg index="2" value="echo" />
+  </bean>
+
 
   <!-- Destinations -->
 
