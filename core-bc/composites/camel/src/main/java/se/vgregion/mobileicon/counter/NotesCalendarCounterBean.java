@@ -5,6 +5,8 @@ import org.apache.camel.builder.xml.XPathBuilder;
 import org.apache.camel.component.restlet.RestletEndpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Calendar;
+
 /**
  * Created by IntelliJ IDEA.
  * User: david
@@ -12,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Time: 12:11
  */
 public class NotesCalendarCounterBean {
+    private int period = 1;
 
     @Autowired
     private ProducerTemplate template;
@@ -20,8 +23,11 @@ public class NotesCalendarCounterBean {
         System.out.println("NotesCalendar: " + userId);
         if (userId == null) return "";
 
+
+        Calendar now = Calendar.getInstance();
         RestletEndpoint ep = context.getEndpoint("restlet://http://aida.vgregion.se", RestletEndpoint.class);
-        ep.setUriPattern("/calendar.nsf/getinfo?openagent&userid="+userId+"&year=2011&month=6&day=1&period=3");
+        ep.setUriPattern("/calendar.nsf/getinfo?openagent&userid="+userId+"&year="+getYear(now)
+                +"&month="+getMonth(now)+"&day="+getDay(now)+"&period="+getPeriod());
 
         System.out.println("1");
         Exchange exchange = call(ep);
@@ -65,5 +71,25 @@ public class NotesCalendarCounterBean {
                     System.out.println(endpoint.getUriPattern());
                 }
             });
+    }
+
+    private int getYear(Calendar date) {
+        return date.get(Calendar.YEAR);
+    }
+
+    private int getMonth(Calendar date) {
+        return date.get(Calendar.MONTH)+1;
+    }
+
+    private int getDay(Calendar date) {
+        return date.get(Calendar.DAY_OF_MONTH);
+    }
+
+    public int getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(int period) {
+        this.period = period;
     }
 }
