@@ -1,9 +1,7 @@
 package se.vgregion.mobileicon.controller;
 
 import com.liferay.portal.kernel.messaging.Message;
-import com.liferay.portal.kernel.messaging.MessageBusException;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
-import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +72,7 @@ public class MobileIconController {
         String counterService = preferences.getValue("counterService", null);
         if (counterService != null) {
             PrintWriter writer = response.getWriter();
-            writer.write(getCount(counterService, userId, 2000));
+            writer.write(getCount(counterService, userId, 4000));
             writer.close();
         }
     }
@@ -91,10 +89,10 @@ public class MobileIconController {
             response = "-";
         }
 
-        if (response != null) {
+        if (response instanceof String) {
             return response.toString();
         } else {
-            return "-";
+            return "";
         }
     }
 
