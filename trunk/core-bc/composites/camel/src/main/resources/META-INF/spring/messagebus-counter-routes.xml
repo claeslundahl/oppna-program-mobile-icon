@@ -21,6 +21,8 @@
 
     <routeBuilder ref="notesCalendarCounter" />
 
+    <routeBuilder ref="notesEmailCounter" />
+
   </camelContext>
 
 
@@ -56,6 +58,18 @@
     <constructor-arg index="2" value="getCount" />
   </bean>
 
+  <bean id="notesEmailCounter" class="se.vgregion.routes.MessagebusBeanrefRouteBuilder">
+    <constructor-arg index="0" value="vgr/counter_notes_email"/>
+    <constructor-arg index="1" value="notesEmailCounterBean" />
+    <constructor-arg index="2" value="getCount" />
+  </bean>
+  
+  <!-- Counter Beans -->
+
+  <bean id="notesEmailCounterBean" class="se.vgregion.mobileicon.counter.NotesEmailCounterBean">
+    <property name="siteKey" value="iNotes" />
+  </bean>
+  
   <!-- Destinations -->
 
   <bean id="destination.test.counter" class="com.liferay.portal.kernel.messaging.SerialDestination"
