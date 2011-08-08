@@ -14,6 +14,10 @@
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
 
+  <properties>
+    <camel-version>2.7.1</camel-version>
+  </properties>
+
   <build>
     <plugins>
       <plugin>
@@ -45,7 +49,24 @@
       <groupId>se.vgregion.commons-util</groupId>
       <artifactId>commons-util-core-bc-composite-svc-camel</artifactId>
       <version>3.6-SNAPSHOT</version>
-      <!--<scope>runtime</scope>-->
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-core</artifactId>
+      <version>${camel-version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-restlet</artifactId>
+      <version>${camel-version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
     </dependency>
 
     <dependency>
