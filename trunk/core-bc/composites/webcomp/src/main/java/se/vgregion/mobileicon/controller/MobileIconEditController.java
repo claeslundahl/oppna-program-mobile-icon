@@ -153,6 +153,10 @@ public class MobileIconEditController implements Serializable {
         String counterService = request.getParameter("counterService");
         String updateInterval = request.getParameter("updateInterval");
 
+        if (updateInterval == null || "".equals(updateInterval)) {
+            updateInterval = "100000000";
+        }
+
         PortletPreferences preferences = request.getPreferences();
         preferences.setValue("title", title);
         preferences.setValue("imageId", imageId);
