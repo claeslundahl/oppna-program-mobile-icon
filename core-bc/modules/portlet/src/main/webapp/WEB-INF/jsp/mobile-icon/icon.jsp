@@ -100,7 +100,9 @@
     </c:choose>
 </div>
 <div id="overlay">
-    <span id="<portlet:namespace/>quick-message">${count}</span>
+    <c:if test="${not empty count}">
+        <span id="<portlet:namespace/>quick-message">${count}</span>
+    </c:if>
 </div>
 
 <script type="text/javascript">
@@ -116,9 +118,15 @@
                 on: {
                     success : function() {
                         var responseValue = this.get('responseData');
-                        responseValue = responseValue.toString()
-                        responseValue = responseValue.substring(0, 6);
-                        <portlet:namespace/>quickMessageSpan.innerHTML = responseValue;
+                        if (responseValue == null || responseValue == "") {
+                            <portlet:namespace/>quickMessageSpan.style.display = "none";
+                        } else {
+                            responseValue = responseValue.toString();
+                            responseValue = responseValue.substring(0, 6);
+
+                            <portlet:namespace/>quickMessageSpan.innerHTML = responseValue;
+                            <portlet:namespace/>quickMessageSpan.style.display = "inline"
+                        }
                     }
                 }
             });

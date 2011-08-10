@@ -79,19 +79,22 @@ public class MobileIconController {
 
     private String getCount(String counterService, String userId, int timeoutMillis) {
         Message message = new Message();
-        message.setPayload(userId);
+        message.setPayload(userId == null ? "" : userId);
 
         Object response;
         try {
             response = MessageBusUtil.sendSynchronousMessage(counterService, message, timeoutMillis);
         } catch (Exception e) {
-            LOGGER.warn("No response.", e);
+            e.printStackTrace();
             response = "-";
         }
 
         if (response instanceof String) {
             return response.toString();
         } else {
+            if (response instanceof Exception) {
+                ((Exception) response).printStackTrace();
+            }
             return "";
         }
     }

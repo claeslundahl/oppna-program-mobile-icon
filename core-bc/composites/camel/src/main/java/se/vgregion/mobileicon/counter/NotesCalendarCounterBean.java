@@ -3,8 +3,13 @@ package se.vgregion.mobileicon.counter;
 import org.apache.camel.*;
 import org.apache.camel.builder.xml.XPathBuilder;
 import org.apache.camel.component.restlet.RestletEndpoint;
+import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Calendar;
 
 /**
@@ -19,30 +24,43 @@ public class NotesCalendarCounterBean {
     @Autowired
     private ProducerTemplate template;
 
-    public String getCount(final String userId, CamelContext context) {
+    public String getCount(final String userId, CamelContext context) throws URISyntaxException, IOException {
         System.out.println("NotesCalendar: " + userId);
-        if (userId == null) return "";
+        if (userId == null || "".equals(userId)) return "";
 
 
         Calendar now = Calendar.getInstance();
-        RestletEndpoint ep = context.getEndpoint("restlet://http://aida.vgregion.se", RestletEndpoint.class);
-        ep.setUriPattern("/calendar.nsf/getinfo?openagent&userid="+userId+"&year="+getYear(now)
-                +"&month="+getMonth(now)+"&day="+getDay(now)+"&period="+getPeriod());
+        RestletEndpoint endpoint = context.getEndpoint("restlet://http://aida.vgregion.se", RestletEndpoint.class);
+        endpoint.setUriPattern("/calendar.nsf/getinfo?openagent&userid=" + userId + "&year=" + getYear(now)
+                + "&month=" + getMonth(now) + "&day=" + getDay(now) + "&period=" + getPeriod());
 
         System.out.println("1");
-        Exchange exchange = call(ep);
+        URI uri = new URI("http", "aida.vgregion.se", "/calendar.nsf/getinfo", "openagent&userid=" + userId + "&year=" + getYear(now)
+                + "&month=" + getMonth(now) + "&day=" + getDay(now) + "&period=" + getPeriod(), "");
+
+        URL url = uri.toURL();
+
+        String response = IOUtils.toString(url.openStream());
+        System.out.println("URL Response: " + response);
+
+        Exchange exchange = call(endpoint);
+
 
         if (exchange.getException() != null) {
+            exchange.getException().printStackTrace();
             System.out.println("2");
-            exchange = call(ep);
+            exchange = call(endpoint);
 
             if (exchange.getException() != null) {
+                exchange.getException().printStackTrace();
                 System.out.println("3");
-                exchange = call(ep);
+                exchange = call(endpoint);
             }
         }
 
         Object reply = exchange.getOut().getBody();
+
+        System.out.println(reply);
 
         try {
             String status = XPathBuilder.xpath("/calendarItems/status/text()").evaluate(context, reply,
@@ -62,15 +80,16 @@ public class NotesCalendarCounterBean {
     }
 
     private Exchange call(final RestletEndpoint endpoint) {
-        return template.send(endpoint, new Processor() {
-                @Override
-                public void process(Exchange exchange) throws Exception {
-                    exchange.setPattern(ExchangePattern.InOut);
-                    exchange.getIn().setHeader(Exchange.HTTP_METHOD, "GET");
-                    exchange.getIn().setHeader(Exchange.ACCEPT_CONTENT_TYPE, "*/*");
-                    System.out.println(endpoint.getUriPattern());
-                }
-            });
+        Exchange exchange = template.send(endpoint, new Processor() {
+            @Override
+            public void process(Exchange exchange) throws Exception {
+                exchange.setPattern(ExchangePattern.InOut);
+                exchange.getIn().setHeader(Exchange.HTTP_METHOD, "GET");
+                exchange.getIn().setHeader(Exchange.ACCEPT_CONTENT_TYPE, "*/*");
+                System.out.println(endpoint.getUriPattern());
+            }
+        });
+        return exchange;
     }
 
     private int getYear(Calendar date) {
