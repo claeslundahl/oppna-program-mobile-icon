@@ -16,6 +16,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
 import org.springframework.beans.factory.annotation.Autowired;
+import se.vgregion.portal.csiframe.service.UserSiteCredentialService;
 
 import java.io.IOException;
 import java.net.URI;
@@ -29,6 +30,9 @@ import java.net.URISyntaxException;
  */
 public class NotesEmailCounterBean {
     private String siteKey;
+
+    @Autowired
+    private UserSiteCredentialService credentialService;
 
     @Autowired
     private ProducerTemplate template;
@@ -67,8 +71,11 @@ public class NotesEmailCounterBean {
     }
 
     private String getSitePassword(String userId, String siteKey) {
-        // TODO: lookup user password
-        return "";
+        try {
+            return credentialService.getUserSiteCredential(userId, siteKey).getSitePassword();
+        } catch (Exception ex) {
+            return "";
+        }
     }
 
     public String getSiteKey() {

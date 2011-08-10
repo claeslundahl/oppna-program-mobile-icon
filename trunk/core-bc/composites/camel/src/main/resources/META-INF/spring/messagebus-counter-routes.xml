@@ -8,6 +8,9 @@
                            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
 
   <import resource="messagebus-common.xml"/>
+  <import resource="classpath*:service-configuration.xml" />
+  <context:annotation-config />
+  <context:spring-configured />
 
   <camelContext xmlns="http://camel.apache.org/schema/spring">
 
@@ -69,7 +72,8 @@
   <bean id="notesEmailCounterBean" class="se.vgregion.mobileicon.counter.NotesEmailCounterBean">
     <property name="siteKey" value="iNotes" />
   </bean>
-  
+
+
   <!-- Destinations -->
 
   <bean id="destination.test.counter" class="com.liferay.portal.kernel.messaging.SerialDestination"
