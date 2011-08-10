@@ -8,6 +8,7 @@
     <property name="locations">
       <list>
         <value>classpath:META-INF/camel.properties</value>
+        <value>classpath*:datasource.properties</value>
       </list>
     </property>
   </bean>
