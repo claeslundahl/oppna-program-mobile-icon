@@ -72,7 +72,7 @@ public class MobileIconController {
         String counterService = preferences.getValue("counterService", null);
         if (counterService != null) {
             PrintWriter writer = response.getWriter();
-            writer.write(getCount(counterService, userId, 4000));
+            writer.write(getCount(counterService, userId, 10000));
             writer.close();
         }
     }
