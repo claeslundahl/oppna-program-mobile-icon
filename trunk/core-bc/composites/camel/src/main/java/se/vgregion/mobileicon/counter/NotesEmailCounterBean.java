@@ -1,11 +1,25 @@
 package se.vgregion.mobileicon.counter;
 
-import org.apache.camel.*;
-import org.apache.camel.builder.xml.XPathBuilder;
-import org.apache.camel.component.restlet.RestletConstants;
-import org.apache.camel.component.restlet.RestletEndpoint;
+import org.apache.camel.CamelContext;
+import org.apache.camel.ProducerTemplate;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.*;
+import org.apache.http.auth.*;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.protocol.ClientContext;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.ExecutionContext;
+import org.apache.http.protocol.HttpContext;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Created by IntelliJ IDEA.
@@ -19,53 +33,37 @@ public class NotesEmailCounterBean {
     @Autowired
     private ProducerTemplate template;
 
-    public String getCount(final String userId, CamelContext context) {
+    public String getCount(final String userId, CamelContext context) throws IOException, URISyntaxException {
         System.out.println("NotesEmail: " + userId);
         if (userId == null) return "";
 
         final String sitePassword = getSitePassword(userId, siteKey);
         if (StringUtils.isBlank(sitePassword)) return "";
 
-        RestletEndpoint ep = context.getEndpoint("restlet://http://aida.vgregion.se/calendar" +
-            ".nsf/unreadcount?openagent&userid="+userId, RestletEndpoint.class);
+        URI uri = new URI("http", "aida.vgregion.se", "/calendar.nsf/unreadcount", "openagent&userid=" + userId, "");
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        HttpGet httpGet = new HttpGet(uri);
 
+        BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
+        credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userId, sitePassword));
+        httpClient.setCredentialsProvider(credsProvider);
 
-        System.out.println("1");
-        Exchange exchange = call(ep, userId, sitePassword);
+        BasicHttpContext localcontext = new BasicHttpContext();
 
-        if (exchange.getException() != null) {
-            System.out.println("2");
-            call(ep, userId, sitePassword);
+        // Generate BASIC scheme object and stick it to the local
+        // execution context
+        BasicScheme basicAuth = new BasicScheme();
+        localcontext.setAttribute("preemptive-auth", basicAuth);
 
-            if (exchange.getException() != null) {
-                System.out.println("3");
-                call(ep, userId, sitePassword);
-            }
-        }
+        // Add as the first request interceptor
+        httpClient.addRequestInterceptor(new PreemptiveAuth(), 0);
 
-        Object reply = exchange.getOut().getBody();
-        System.out.println("result: "+reply.toString());
-        if (XPathBuilder.xpath("/html").matches(context, reply)) return "";
+        HttpResponse httpResponse = httpClient.execute(httpGet, localcontext);
+        String reply = IOUtils.toString(httpResponse.getEntity().getContent());
+
+        if (reply.contains("DOCTYPE")) return "";
 
         return reply.toString();
-    }
-
-    private Exchange call(final RestletEndpoint endpoint, final String userId, final String sitePassword) {
-        return template.send(endpoint,
-            new Processor() {
-                @Override
-                public void process(Exchange exchange) throws Exception {
-                    exchange.setPattern(ExchangePattern.InOut);
-                    Message inMessage = exchange.getIn();
-                    inMessage.setHeader(Exchange.HTTP_METHOD, "GET");
-                    inMessage.setHeader(Exchange.ACCEPT_CONTENT_TYPE, "*/*");
-
-                    inMessage.setHeader(RestletConstants.RESTLET_LOGIN, userId);
-                    inMessage.setHeader(RestletConstants.RESTLET_PASSWORD, sitePassword);
-                    inMessage.setBody(" ");
-                    System.out.println(endpoint.getUriPattern());
-                }
-            });
     }
 
     private String getSitePassword(String userId, String siteKey) {
@@ -80,4 +78,31 @@ public class NotesEmailCounterBean {
     public void setSiteKey(String siteKey) {
         this.siteKey = siteKey;
     }
+
+    static class PreemptiveAuth implements HttpRequestInterceptor {
+        public void process(final HttpRequest request, final HttpContext context) throws HttpException,
+                IOException {
+
+            AuthState authState = (AuthState) context.getAttribute(ClientContext.TARGET_AUTH_STATE);
+
+            // If no auth scheme avaialble yet, try to initialize it
+            // preemptively
+            if (authState.getAuthScheme() == null) {
+                AuthScheme authScheme = (AuthScheme) context.getAttribute("preemptive-auth");
+                CredentialsProvider credsProvider = (CredentialsProvider) context
+                        .getAttribute(ClientContext.CREDS_PROVIDER);
+                HttpHost targetHost = (HttpHost) context.getAttribute(ExecutionContext.HTTP_TARGET_HOST);
+                if (authScheme != null) {
+                    Credentials creds = credsProvider.getCredentials(new AuthScope(targetHost.getHostName(),
+                            targetHost.getPort()));
+                    if (creds == null) {
+                        throw new HttpException("No credentials for preemptive authentication");
+                    }
+                    authState.setAuthScheme(authScheme);
+                    authState.setCredentials(creds);
+                }
+            }
+        }
+    }
+
 }

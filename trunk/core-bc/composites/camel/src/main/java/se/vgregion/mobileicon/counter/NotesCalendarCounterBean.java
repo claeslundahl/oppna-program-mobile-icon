@@ -4,12 +4,16 @@ import org.apache.camel.*;
 import org.apache.camel.builder.xml.XPathBuilder;
 import org.apache.camel.component.restlet.RestletEndpoint;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Calendar;
 
 /**
@@ -21,75 +25,40 @@ import java.util.Calendar;
 public class NotesCalendarCounterBean {
     private int period = 1;
 
+    private static Logger logger = LoggerFactory.getLogger(NotesCalendarCounterBean.class);
+
     @Autowired
     private ProducerTemplate template;
 
     public String getCount(final String userId, CamelContext context) throws URISyntaxException, IOException {
-        System.out.println("NotesCalendar: " + userId);
         if (userId == null || "".equals(userId)) return "";
 
-
         Calendar now = Calendar.getInstance();
-        RestletEndpoint endpoint = context.getEndpoint("restlet://http://aida.vgregion.se", RestletEndpoint.class);
-        endpoint.setUriPattern("/calendar.nsf/getinfo?openagent&userid=" + userId + "&year=" + getYear(now)
-                + "&month=" + getMonth(now) + "&day=" + getDay(now) + "&period=" + getPeriod());
 
-        System.out.println("1");
-        URI uri = new URI("http", "aida.vgregion.se", "/calendar.nsf/getinfo", "openagent&userid=" + userId + "&year=" + getYear(now)
-                + "&month=" + getMonth(now) + "&day=" + getDay(now) + "&period=" + getPeriod(), "");
+        URI uri = new URI("http", "aida.vgregion.se", "/calendar.nsf/getinfo", "openagent&userid=" + userId + "&year="
+                + getYear(now) + "&month=" + getMonth(now) + "&day=" + getDay(now) + "&period=" + getPeriod(), "");
 
-        URL url = uri.toURL();
+        DefaultHttpClient httpClient = new DefaultHttpClient();
+        HttpGet httpGet = new HttpGet(uri);
 
-        String response = IOUtils.toString(url.openStream());
-        System.out.println("URL Response: " + response);
-
-        Exchange exchange = call(endpoint);
-
-
-        if (exchange.getException() != null) {
-            exchange.getException().printStackTrace();
-            System.out.println("2");
-            exchange = call(endpoint);
-
-            if (exchange.getException() != null) {
-                exchange.getException().printStackTrace();
-                System.out.println("3");
-                exchange = call(endpoint);
-            }
-        }
-
-        Object reply = exchange.getOut().getBody();
-
-        System.out.println(reply);
+        HttpResponse httpResponse = httpClient.execute(httpGet);
+        String reply = IOUtils.toString(httpResponse.getEntity().getContent());
 
         try {
             String status = XPathBuilder.xpath("/calendarItems/status/text()").evaluate(context, reply,
                     java.lang.String.class);
-            System.out.println(status);
 
             if ("PROCESSED".equals(status)) {
-                String res = XPathBuilder.xpath("/calendarItems/total/text()").evaluate(context, reply, java.lang.String.class);
-                System.out.println("Result: " + res);
+                String res = XPathBuilder.xpath("/calendarItems/total/text()").evaluate(context, reply,
+                        java.lang.String.class);
                 return res;
             }
+
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            logger.warn(ex.getMessage());
         }
 
         return "-";
-    }
-
-    private Exchange call(final RestletEndpoint endpoint) {
-        Exchange exchange = template.send(endpoint, new Processor() {
-            @Override
-            public void process(Exchange exchange) throws Exception {
-                exchange.setPattern(ExchangePattern.InOut);
-                exchange.getIn().setHeader(Exchange.HTTP_METHOD, "GET");
-                exchange.getIn().setHeader(Exchange.ACCEPT_CONTENT_TYPE, "*/*");
-                System.out.println(endpoint.getUriPattern());
-            }
-        });
-        return exchange;
     }
 
     private int getYear(Calendar date) {
@@ -97,7 +66,7 @@ public class NotesCalendarCounterBean {
     }
 
     private int getMonth(Calendar date) {
-        return date.get(Calendar.MONTH)+1;
+        return date.get(Calendar.MONTH) + 1;
     }
 
     private int getDay(Calendar date) {

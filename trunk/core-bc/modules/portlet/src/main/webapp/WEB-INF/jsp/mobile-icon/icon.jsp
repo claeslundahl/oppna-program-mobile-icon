@@ -118,7 +118,7 @@
                 on: {
                     success : function() {
                         var responseValue = this.get('responseData');
-                        if (responseValue == null || responseValue == "") {
+                        if (responseValue == null ) {
                             <portlet:namespace/>quickMessageSpan.style.display = "none";
                         } else {
                             responseValue = responseValue.toString();
