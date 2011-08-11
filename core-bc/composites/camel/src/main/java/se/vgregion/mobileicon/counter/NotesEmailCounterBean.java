@@ -1,9 +1,6 @@
 package se.vgregion.mobileicon.counter;
 
-import org.apache.camel.CamelContext;
-import org.apache.camel.ProducerTemplate;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.*;
 import org.apache.http.auth.*;
 import org.apache.http.client.CredentialsProvider;
@@ -12,10 +9,15 @@ import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HttpContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import se.vgregion.portal.csiframe.domain.UserSiteCredential;
 import se.vgregion.portal.csiframe.service.UserSiteCredentialService;
 
 import java.io.IOException;
@@ -31,20 +33,32 @@ import java.net.URISyntaxException;
 public class NotesEmailCounterBean {
     private String siteKey;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotesEmailCounterBean.class);
+
     @Autowired
     private UserSiteCredentialService credentialService;
 
-    @Autowired
-    private ProducerTemplate template;
+    public String getCount(final String userId) throws IOException, URISyntaxException {
+        if (userId == null) {
+            return "";
+        }
 
-    public String getCount(final String userId, CamelContext context) throws IOException, URISyntaxException {
-        System.out.println("NotesEmail: " + userId);
-        if (userId == null) return "";
+        final UserSiteCredential userSiteCredential = getSitePassword(userId, siteKey);
 
-        final String sitePassword = getSitePassword(userId, siteKey);
-        if (StringUtils.isBlank(sitePassword)) return "";
+        if (userSiteCredential == null) {
+            return "";
+        }
 
-        URI uri = new URI("http", "aida.vgregion.se", "/calendar.nsf/unreadcount", "openagent&userid=" + userId, "");
+        URI uri = new URI("http", "aida.vgregion.se", "/calendar.nsf/unreadcount", "openagent&userid=" +
+                userSiteCredential.getSiteUser(), "");
+
+        HttpResponse httpResponse = callService(userSiteCredential.getSiteUser(),
+                userSiteCredential.getSitePassword(), uri);
+
+        return handleResponse(httpResponse);
+    }
+
+    private HttpResponse callService(String userId, String sitePassword, URI uri) throws IOException {
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(uri);
 
@@ -52,29 +66,49 @@ public class NotesEmailCounterBean {
         credsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userId, sitePassword));
         httpClient.setCredentialsProvider(credsProvider);
 
-        BasicHttpContext localcontext = new BasicHttpContext();
+        BasicHttpContext httpContext = new BasicHttpContext();
 
         // Generate BASIC scheme object and stick it to the local
         // execution context
         BasicScheme basicAuth = new BasicScheme();
-        localcontext.setAttribute("preemptive-auth", basicAuth);
+        httpContext.setAttribute("preemptive-auth", basicAuth);
 
         // Add as the first request interceptor
         httpClient.addRequestInterceptor(new PreemptiveAuth(), 0);
 
-        HttpResponse httpResponse = httpClient.execute(httpGet, localcontext);
-        String reply = IOUtils.toString(httpResponse.getEntity().getContent());
+        HttpParams params = httpClient.getParams();
+        HttpConnectionParams.setConnectionTimeout(params, 10000);
+        HttpConnectionParams.setSoTimeout(params, 10000);
 
-        if (reply.contains("DOCTYPE")) return "";
-
-        return reply.toString();
+        return httpClient.execute(httpGet, httpContext);
     }
 
-    private String getSitePassword(String userId, String siteKey) {
+    private String handleResponse(HttpResponse httpResponse) throws IOException {
+        if (httpResponse.getStatusLine().getStatusCode() == 200) {
+            String reply = IOUtils.toString(httpResponse.getEntity().getContent());
+
+            if (reply == null) {
+                LOGGER.error("Http request failed. Service did not respond.");
+                return "-";
+            }
+
+            if (reply.contains("DOCTYPE")) {
+                return "-";
+            }
+
+            return reply.toString();
+        } else {
+            LOGGER.error("Http request failed. Response code=" + httpResponse.getStatusLine().getStatusCode() + ". " +
+                    httpResponse.getStatusLine().getReasonPhrase());
+            return "-";
+        }
+    }
+
+    private UserSiteCredential getSitePassword(String userId, String siteKey) {
         try {
-            return credentialService.getUserSiteCredential(userId, siteKey).getSitePassword();
+            return credentialService.getUserSiteCredential(userId, siteKey);
         } catch (Exception ex) {
-            return "";
+            return null;
         }
     }
 

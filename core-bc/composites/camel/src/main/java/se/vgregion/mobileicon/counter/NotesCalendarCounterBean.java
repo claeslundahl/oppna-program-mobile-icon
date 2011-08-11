@@ -2,11 +2,12 @@ package se.vgregion.mobileicon.counter;
 
 import org.apache.camel.*;
 import org.apache.camel.builder.xml.XPathBuilder;
-import org.apache.camel.component.restlet.RestletEndpoint;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import java.util.Calendar;
 public class NotesCalendarCounterBean {
     private int period = 1;
 
-    private static Logger logger = LoggerFactory.getLogger(NotesCalendarCounterBean.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotesCalendarCounterBean.class);
 
     @Autowired
     private ProducerTemplate template;
@@ -38,27 +39,53 @@ public class NotesCalendarCounterBean {
         URI uri = new URI("http", "aida.vgregion.se", "/calendar.nsf/getinfo", "openagent&userid=" + userId + "&year="
                 + getYear(now) + "&month=" + getMonth(now) + "&day=" + getDay(now) + "&period=" + getPeriod(), "");
 
+        HttpResponse httpResponse = callService(uri);
+
+        return handleResponse(context, httpResponse);
+    }
+
+    private HttpResponse callService(URI uri) throws IOException {
         DefaultHttpClient httpClient = new DefaultHttpClient();
         HttpGet httpGet = new HttpGet(uri);
 
-        HttpResponse httpResponse = httpClient.execute(httpGet);
-        String reply = IOUtils.toString(httpResponse.getEntity().getContent());
+        HttpParams params = httpClient.getParams();
+        HttpConnectionParams.setConnectionTimeout(params, 10000);
+        HttpConnectionParams.setSoTimeout(params, 10000);
 
-        try {
-            String status = XPathBuilder.xpath("/calendarItems/status/text()").evaluate(context, reply,
-                    java.lang.String.class);
+        return httpClient.execute(httpGet);
+    }
 
-            if ("PROCESSED".equals(status)) {
-                String res = XPathBuilder.xpath("/calendarItems/total/text()").evaluate(context, reply,
-                        java.lang.String.class);
-                return res;
+    private String handleResponse(CamelContext context, HttpResponse httpResponse) throws IOException {
+        if (httpResponse.getStatusLine().getStatusCode() == 200) {
+            String reply = IOUtils.toString(httpResponse.getEntity().getContent());
+
+            if (reply == null) {
+                LOGGER.error("Http request failed. Service did not respond.");
+                return "-";
             }
 
-        } catch (Exception ex) {
-            logger.warn(ex.getMessage());
-        }
+            try {
+                String status = XPathBuilder.xpath("/calendarItems/status/text()").evaluate(context, reply,
+                        String.class);
 
-        return "-";
+                if ("PROCESSED".equals(status)) {
+                    String res = XPathBuilder.xpath("/calendarItems/total/text()").evaluate(context, reply,
+                            String.class);
+                    return res;
+                } else {
+                    return ""; //The user does not have any notes calendar and should receive nothing.
+                }
+
+            } catch (Exception ex) {
+                LOGGER.warn(ex.getMessage());
+            }
+
+            return "-";
+        } else {
+            LOGGER.error("Http request failed. Response code=" + httpResponse.getStatusLine().getStatusCode() + ". " +
+                    httpResponse.getStatusLine().getReasonPhrase());
+            return "-";
+        }
     }
 
     private int getYear(Calendar date) {
