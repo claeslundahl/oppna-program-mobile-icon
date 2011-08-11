@@ -85,7 +85,7 @@ public class MobileIconController {
         try {
             response = MessageBusUtil.sendSynchronousMessage(counterService, message, timeoutMillis);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info(e.getMessage());
             response = "-";
         }
 
@@ -95,7 +95,7 @@ public class MobileIconController {
             if (response instanceof Exception) {
                 ((Exception) response).printStackTrace();
             }
-            return "";
+            return "-";
         }
     }
 
