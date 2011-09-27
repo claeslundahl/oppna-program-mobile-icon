@@ -2,141 +2,104 @@
 <%@ taglib prefix="portlet" uri="http://java.sun.com/portlet_2_0" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<style type="text/css">
-    A:link {
-        text-decoration: none
-    }
-
-    A:visited {
-        text-decoration: none;
-        color: black;
-    }
-
-    A:active {
-        text-decoration: none
-    }
-
-    A:hover {
-        text-decoration: none;
-    }
-
-    .mobile-icon {
-        height: 150px;
-        width: 150px;
-    }
-
-    #overlay {
-        width: 40px;
-        height: 40px;
-        position: relative;
-        left: 120px;
-        top: -60px;
-        z-index: 0;
-    }
-
-    .stretch {
-        width: 100%;
-        height: 100%;
-    }
-
-    #<portlet:namespace/>quick-message {
-        height: 100%;
-        left: 0px;
-        line-height: 40px;
-        position: absolute;
-        text-align: center;
-        width: 100%;
-        border: solid 1px;
-        border-radius: 20px 20px 20px 20px;
-        -moz-border-radius: 20px;
-        -webkit-border-radius: 20px;
-        background-color: #ffffff;
-    }
-
-    .title-text {
-        text-decoration: none;
-        width: 150px;
-        text-align: center;
-    }
-
-</style>
-
 <portlet:actionURL var="showWidget">
     <portlet:param name="action" value="showWidget"/>
 </portlet:actionURL>
-<portlet:resourceURL var="fetchCount">
+<portlet:resourceURL var="fetchCount" />
 
-</portlet:resourceURL>
+<c:set var="appCssClass" value="" scope="page" />
 
-<div style="text-align: left;">
+<c:choose>
+	<c:when test="${title eq 'Nyheter'}">
+		<c:set var="appCssClass" value="app-news" scope="page" />
+	</c:when>
+	<c:when test="${title eq 'Insidan'}">
+		<c:set var="appCssClass" value="app-intranet" scope="page" />
+	</c:when>
+	<c:when test="${title eq 'Epost'}">
+		<c:set var="appCssClass" value="app-mail" scope="page" />
+	</c:when>
+	<c:when test="${title eq 'Uppgifter'}">
+		<c:set var="appCssClass" value="app-todos" scope="page" />
+	</c:when>
+	<c:when test="${title eq 'Dokument'}">
+		<c:set var="appCssClass" value="app-documents" scope="page" />
+	</c:when>
+	<c:when test="${title eq 'Kontakter'}">
+		<c:set var="appCssClass" value="app-contacts" scope="page" />
+	</c:when>
+	<c:when test="${title eq 'Kalender'}">
+		<c:set var="appCssClass" value="app-calendar" scope="page" />
+	</c:when>
+	<c:when test="${title eq 'Väntetider'}">
+		<c:set var="appCssClass" value="app-waiting-times" scope="page" />
+	</c:when>
+	<c:when test="${title eq 'Filmer'}">
+		<c:set var="appCssClass" value="app-movies" scope="page" />
+	</c:when>
+</c:choose>
 
-    <c:choose>
-        <c:when test="${target eq 'url'}">
-            <a href="${targetUrl}" target="_blank" style="text-decoration: none; ">
-                <c:choose>
-                    <c:when test="${not empty imageId}">
-                        <img class="mobile-icon" src="/image/image_gallery?img_id=${imageId}"/>
-                    </c:when>
-                    <c:otherwise>
-                        <img class="mobile-icon" src="${pageContext.request.contextPath}/images/not_found.jpg"/>
-                    </c:otherwise>
-                </c:choose>
-                <div class="title-text">${title}</div>
-            </a>
-        </c:when>
-        <c:otherwise>
-            <a href="${showWidget}" style="text-decoration: none; ">
-                <c:choose>
-                    <c:when test="${not empty imageId}">
-                        <img class="mobile-icon" src="/image/image_gallery?img_id=${imageId}"/>
-                    </c:when>
-                    <c:otherwise>
-                        <img class="mobile-icon" src="${pageContext.request.contextPath}/images/not_found.jpg"/>
-                    </c:otherwise>
-                </c:choose>
-                <div class="title-text">${title}</div>
-            </a>
-        </c:otherwise>
-    </c:choose>
-</div>
-<div id="overlay">
-    <c:if test="${not empty count}">
-        <span id="<portlet:namespace/>quick-message">${count}</span>
-    </c:if>
+<div class="${appCssClass}">
+
+	<c:set var="linkURL" value="${showWidget}" scope="page" />
+	<c:set var="targetVal" value="" scope="page" />
+	<c:if test="${target eq 'url'}">
+		<c:set var="linkURL" value="${targetUrl}" scope="page" />
+		<c:set var="targetVal" value="_BLANK" scope="page" />
+	</c:if>
+	
+	<a href="${linkURL}" target="${targetVal}" class="app-link">
+	    <h1>
+	    	<c:set var="countCssClass" value="" scope="page" />
+	    	<c:if test="${count eq '-'}">
+	    		<c:set var="countCssClass" value="aui-helper-hidden" scope="page" />
+	    	</c:if>
+			<span class="app-title">${title}</span> <c:if test="${not empty count}"><span id="<portlet:namespace/>quick-message" class="count ${countCssClass}"><span>${count}</span></span></c:if>
+	   	</h1>
+	</a>
 </div>
 
 <script type="text/javascript">
-
-    var <portlet:namespace/>quickMessageSpan = document.getElementById("<portlet:namespace/>quick-message");
-
-    function <portlet:namespace/>updateCounter() {
-        AUI().use('aui-io-request', function(A) {
-            var url = "${fetchCount}";
-            A.io.request(url, {
-                dataType: 'json',
-                method: 'GET',
-                on: {
-                    success : function() {
-                        var responseValue = this.get('responseData');
-                        if (responseValue == null ) {
-                            <portlet:namespace/>quickMessageSpan.style.display = "none";
-                        } else {
-                            responseValue = responseValue.toString();
-                            responseValue = responseValue.substring(0, 6);
-
-                            <portlet:namespace/>quickMessageSpan.innerHTML = responseValue;
-                            <portlet:namespace/>quickMessageSpan.style.display = "inline"
-                        }
-                    }
-                }
-            });
-        });
-    }
-
-    if (<portlet:namespace/>quickMessageSpan.innerHTML == "-") {
-        <portlet:namespace/>updateCounter();
-        setInterval("<portlet:namespace/>updateCounter()", ${updateInterval * 1000});
-    } else {
-        setInterval("<portlet:namespace/>updateCounter()", ${updateInterval * 1000});
-    }
+	AUI().ready('aui-base', 'aui-io-request', function(A) {
+		var updateTimer, updateIO;
+		
+		var countNode = A.one('#<portlet:namespace/>quick-message');
+		var updateURL = '${fetchCount}';
+		var updateInterval = ${updateInterval * 1000};
+		
+		
+		var onUpdateSuccess = function(e, id, xhr) {
+			var responseValue = xhr.responseText;
+			
+			//countNode
+	        if (responseValue == null || responseValue == '') {
+	        	countNode.hide();
+	        } else {
+	        	countNode.show();
+	        	
+	        	var countNodeInner = countNode.one('span');
+	        	
+	            responseValue = responseValue.toString().substring(0, 6);
+	            countNodeInner.html(responseValue);
+	        }
+		}
+		
+		updateIO = A.io.request(updateURL, {
+			autoLoad : false,
+			cache: false,
+			dataType: 'json',
+			method : 'GET'
+		});
+		
+		// Attach success handler to io request
+	    updateIO.on('success', onUpdateSuccess);
+		
+		// Function that performs an update
+		var updateCounter = function() {
+			updateIO.stop();
+			updateIO.start();
+		}
+		
+		updateTimer = A.later(updateInterval, countNode, updateCounter);
+	});
 </script>
