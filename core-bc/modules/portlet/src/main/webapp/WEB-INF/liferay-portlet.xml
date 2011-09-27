@@ -8,5 +8,6 @@
     <action-url-redirect>true</action-url-redirect>
     <maximize-edit>true</maximize-edit>
     <instanceable>true</instanceable>
+    <css-class-wrapper>app-icon</css-class-wrapper>
   </portlet>
 </liferay-portlet-app>
