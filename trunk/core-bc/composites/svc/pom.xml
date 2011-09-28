@@ -1,37 +1,52 @@
 <?xml version="1.0"?>
-	<!--
-		This is the Service-composite Maven POM. Template version:
-		1.4 Generation time : 2011-07-25 09:05:40 CEST
-	-->
+<!-- This is the Service-composite Maven POM. Template version: 1.4 Generation time : 2011-07-25 09:05:40 CEST -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>se.vgregion.mobile-icon</groupId>
-		<artifactId>mobile-icon-core-bc</artifactId>
-		<version>1.0-SNAPSHOT</version>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>se.vgregion.mobile-icon</groupId>
+    <artifactId>mobile-icon-core-bc</artifactId>
+    <version>1.0-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
-	</parent>
-	<groupId>se.vgregion.mobile-icon</groupId>
-	<artifactId>mobile-icon-core-bc-composite-svc</artifactId>
-	<packaging>jar</packaging>
-	<name>${project.artifactId}</name>
+  </parent>
+  <groupId>se.vgregion.mobile-icon</groupId>
+  <artifactId>mobile-icon-core-bc-composite-svc</artifactId>
+  <packaging>jar</packaging>
+  <name>${project.artifactId}</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>mobile-icon-core-bc-composite-types</artifactId>
-			<version>${project.version}</version>
-		</dependency>
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>mobile-icon-core-bc-composite-types</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-		</dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+    </dependency>
 
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-		</dependency>
-	</dependencies>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.liferay.portal</groupId>
+      <artifactId>util-taglib</artifactId>
+      <version>6.0.12</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.liferay.portal</groupId>
+      <artifactId>portal-impl</artifactId>
+      <version>6.0.12</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.liferay.portal</groupId>
+      <artifactId>portal-service</artifactId>
+      <version>6.0.12</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
 </project>
