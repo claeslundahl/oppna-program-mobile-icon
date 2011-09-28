@@ -27,14 +27,15 @@
   <description>Portlet for being used in the mobile site as an "app shortcut"</description>
 
   <listener>
+    <listener-class>com.liferay.portal.kernel.servlet.PortletContextListener</listener-class>
+  </listener>
+  <listener>
     <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
 
   <context-param>
     <param-name>contextConfigLocation</param-name>
-    <param-value>
-      classpath:/applicationContext.xml
-    </param-value>
+    <param-value>classpath*:/applicationContext.xml</param-value>
   </context-param>
 
   <servlet>
@@ -46,5 +47,33 @@
   <servlet-mapping>
     <servlet-name>view</servlet-name>
     <url-pattern>/WEB-INF/servlet/view</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>MobileIcon</servlet-name>
+    <servlet-class>com.liferay.portal.kernel.servlet.PortletServlet</servlet-class>
+    <init-param>
+      <param-name>portlet-class</param-name>
+      <param-value>org.springframework.web.portlet.DispatcherPortlet</param-value>
+    </init-param>
+    <load-on-startup>0</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MobileIcon</servlet-name>
+    <url-pattern>/mobileicon/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>MobileSettings</servlet-name>
+    <servlet-class>com.liferay.portal.kernel.servlet.PortletServlet</servlet-class>
+    <init-param>
+      <param-name>portlet-class</param-name>
+      <param-value>org.springframework.web.portlet.DispatcherPortlet</param-value>
+    </init-param>
+    <load-on-startup>0</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MobileSettings</servlet-name>
+    <url-pattern>/mobilesettings/*</url-pattern>
   </servlet-mapping>
 </web-app>
