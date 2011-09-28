@@ -15,16 +15,20 @@
 
   <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
     <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
-    <property name="prefix" value="/WEB-INF/jsp/mobile-icon/" />
+    <property name="prefix" value="/WEB-INF/jsp/mobile-settings/" />
     <property name="suffix" value=".jsp" />
     <property name="contentType" value="text/html;charset=UTF-8" />
   </bean>
 
   <bean id="expandoColumnService" class="com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil"
     factory-method="getService" />
+
   <bean id="expandoTableService" class="com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil"
     factory-method="getService" />
+
   <bean id="expandoValueService" class="com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil"
     factory-method="getService" />
+
+  <bean id="companyExpandoService" class="se.vgregion.mobilicon.CompanyExpandoService" />
 
 </beans>

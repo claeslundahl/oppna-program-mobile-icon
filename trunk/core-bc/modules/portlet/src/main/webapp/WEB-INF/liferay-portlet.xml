@@ -13,7 +13,7 @@
   <portlet>
     <portlet-name>MobileSettings</portlet-name>
     <control-panel-entry-category>portal</control-panel-entry-category>
-    <control-panel-entry-weight>3.5</control-panel-entry-weight>
+    <control-panel-entry-weight>4.5</control-panel-entry-weight>
     <css-class-wrapper>vgr-settings-portlet</css-class-wrapper>
   </portlet>
 </liferay-portlet-app>

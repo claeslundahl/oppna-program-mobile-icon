@@ -30,22 +30,25 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
     </dependency>
+
     <dependency>
       <groupId>com.liferay.portal</groupId>
       <artifactId>util-taglib</artifactId>
-      <version>6.0.12</version>
+      <version>${liferay.version}</version>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>com.liferay.portal</groupId>
       <artifactId>portal-impl</artifactId>
-      <version>6.0.12</version>
+      <version>${liferay.version}</version>
       <scope>provided</scope>
     </dependency>
+
     <dependency>
       <groupId>com.liferay.portal</groupId>
       <artifactId>portal-service</artifactId>
-      <version>6.0.12</version>
+      <version>${liferay.version}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
