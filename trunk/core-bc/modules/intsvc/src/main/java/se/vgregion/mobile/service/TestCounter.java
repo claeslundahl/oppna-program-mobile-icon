@@ -1,4 +1,4 @@
-package se.vgregion.mobileicon.service;
+package se.vgregion.mobile.service;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;

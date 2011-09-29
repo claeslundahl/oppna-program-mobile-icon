@@ -13,6 +13,8 @@
   <mvc:resources mapping="/resources/**" location="classpath:/**" />
   <mvc:annotation-driven />
 
+  <import resource="classpath*:spring/mobile-settings-*.xml"/>
+
   <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
     <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
     <property name="prefix" value="/WEB-INF/jsp/mobile-settings/" />
@@ -29,6 +31,6 @@
   <bean id="expandoValueService" class="com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil"
     factory-method="getService" />
 
-  <bean id="companyExpandoService" class="se.vgregion.mobilicon.CompanyExpandoService" />
+  <bean id="companyExpandoService" class="se.vgregion.mobile.CompanyExpandoService" />
 
 </beans>

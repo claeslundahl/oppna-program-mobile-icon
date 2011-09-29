@@ -6,7 +6,7 @@
                            http://www.springframework.org/schema/context
                            http://www.springframework.org/schema/context/spring-context.xsd">
 
-  <context:component-scan base-package="se.vgregion.mobileicon.controller" annotation-config="true" />
+  <context:component-scan base-package="se.vgregion.mobile.icon.controller" annotation-config="true" />
 
   <!--<bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
     <property name="basename" value="classpath:i18n/activate-account-messages"/>

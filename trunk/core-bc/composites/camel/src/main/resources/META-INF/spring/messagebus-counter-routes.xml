@@ -57,7 +57,7 @@
 
   <bean id="notesCalendarCounter" class="se.vgregion.routes.MessagebusBeanRouteBuilder">
     <constructor-arg index="0" value="vgr/counter_notes_calendar"/>
-    <constructor-arg index="1" value="se.vgregion.mobileicon.counter.NotesCalendarCounterBean" />
+    <constructor-arg index="1" value="se.vgregion.mobile.counter.NotesCalendarCounterBean" />
     <constructor-arg index="2" value="getCount" />
   </bean>
 
@@ -69,7 +69,7 @@
   
   <!-- Counter Beans -->
 
-  <bean id="notesEmailCounterBean" class="se.vgregion.mobileicon.counter.NotesEmailCounterBean">
+  <bean id="notesEmailCounterBean" class="se.vgregion.mobile.counter.NotesEmailCounterBean">
     <property name="siteKey" value="iNotes" />
   </bean>
 

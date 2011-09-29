@@ -21,6 +21,6 @@
     </jaxrs:providers>
   </jaxrs:server>
 
-  <bean id="testCounter" class="se.vgregion.mobileicon.service.TestCounter" />
+  <bean id="testCounter" class="se.vgregion.mobile.service.TestCounter" />
 
 </beans>
