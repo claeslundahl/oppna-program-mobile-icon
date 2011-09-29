@@ -31,6 +31,6 @@
   <bean id="expandoValueService" class="com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil"
     factory-method="getService" />
 
-  <bean id="companyExpandoService" class="se.vgregion.mobile.CompanyExpandoService" />
+  <bean id="companyExpandoService" class="se.vgregion.mobile.CompanyExpandoServiceImpl" />
 
 </beans>
