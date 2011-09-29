@@ -1,4 +1,4 @@
-package se.vgregion.mobileicon.controller;
+package se.vgregion.mobile.icon.controller;
 
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;

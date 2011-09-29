@@ -1,4 +1,4 @@
-package se.vgregion.mobileicon.counter;
+package se.vgregion.mobile.counter;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.*;

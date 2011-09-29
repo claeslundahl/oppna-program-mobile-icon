@@ -1,4 +1,4 @@
-package se.vgregion.mobilicon;
+package se.vgregion.mobile;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
