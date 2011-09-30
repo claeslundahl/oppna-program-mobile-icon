@@ -1,5 +1,7 @@
 package se.vgregion.mobile.settings.model;
 
+import java.io.Serializable;
+
 /**
  * Created by IntelliJ IDEA.
  * User: david

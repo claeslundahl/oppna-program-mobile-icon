@@ -3,4 +3,15 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
+  <bean id="expandoColumnService" class="com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil"
+    factory-method="getService" />
+
+  <bean id="expandoTableService" class="com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil"
+    factory-method="getService" />
+
+  <bean id="expandoValueService" class="com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil"
+    factory-method="getService" />
+
+  <bean id="companyExpandoService" class="se.vgregion.mobile.CompanyExpandoServiceImpl" />
+
 </beans>

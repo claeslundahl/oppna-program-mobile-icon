@@ -13,6 +13,7 @@
   <mvc:resources mapping="/resources/**" location="classpath:/**" />
   <mvc:annotation-driven />
 
+  <import resource="classpath:applicationContext.xml"/>
   <import resource="classpath*:spring/mobile-settings-*.xml"/>
 
   <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
@@ -22,15 +23,5 @@
     <property name="contentType" value="text/html;charset=UTF-8" />
   </bean>
 
-  <bean id="expandoColumnService" class="com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil"
-    factory-method="getService" />
-
-  <bean id="expandoTableService" class="com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil"
-    factory-method="getService" />
-
-  <bean id="expandoValueService" class="com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil"
-    factory-method="getService" />
-
-  <bean id="companyExpandoService" class="se.vgregion.mobile.CompanyExpandoServiceImpl" />
 
 </beans>
