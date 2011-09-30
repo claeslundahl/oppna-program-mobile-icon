@@ -7,7 +7,7 @@
 </portlet:actionURL>
 <portlet:resourceURL var="fetchCount" />
 
-<c:set var="appCssClass" value="" scope="page" />
+<c:set var="appCssClass" value="${iconStyle}" scope="page" />
 
 <c:choose>
 	<c:when test="${title eq 'Nyheter'}">
@@ -41,7 +41,7 @@
 
 <div class="${appCssClass}">
 
-	<c:set var="linkURL" value="${showWidget}" scope="page" />
+    <c:set var="linkURL" value="${showWidget}" scope="page" />
 	<c:set var="targetVal" value="" scope="page" />
 	<c:if test="${target eq 'url'}">
 		<c:set var="linkURL" value="${targetUrl}" scope="page" />

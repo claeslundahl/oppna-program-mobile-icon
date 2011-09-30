@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import org.springframework.web.portlet.bind.annotation.ResourceMapping;
+import se.vgregion.mobile.icon.model.MobileIconPrefs;
 
 import javax.portlet.*;
 import java.io.IOException;
@@ -37,30 +38,30 @@ public class MobileIconController {
     @RenderMapping
     public String defaultView(RenderRequest request, Model model) {
         String userId = lookupP3PInfo(request, PortletRequest.P3PUserInfos.USER_LOGIN_ID);
-        PortletPreferences preferences = request.getPreferences();
 
-        String imageId = preferences.getValue("imageId", null);
-        String title = preferences.getValue("title", "untitled");
-        String counterService = preferences.getValue("counterService", null);
-        String updateInterval = preferences.getValue("updateInterval", "100000000");
+        MobileIconPrefs prefs = new MobileIconPrefs();
+        prefs.fromPreferences(request);
 
-        String target = preferences.getValue("target", "url");
+        String target = prefs.getTarget("url");
         model.addAttribute("target", target);
         if ("url".equals(target)) {
-            String targetUrl = preferences.getValue("targetUrl", "");
+            String targetUrl = prefs.getTargetUrl("");
             model.addAttribute("targetUrl", targetUrl);
         }
 
-        model.addAttribute("title", title);
-        model.addAttribute("imageId", imageId);
+        model.addAttribute("title", prefs.getTitle("untitled"));
+        model.addAttribute("imageId", prefs.getImageId());
 
+        String counterService = prefs.getCounterService(null);
         if (counterService != null) {
             String cntResult = getCount(counterService, userId, 300);
             if (StringUtils.isNotBlank(cntResult))
                 model.addAttribute("count", cntResult);
         }
+
+        model.addAttribute("iconStyle", prefs.getIconStyle("mobile-none"));
         
-        model.addAttribute("updateInterval", updateInterval);
+        model.addAttribute("updateInterval", prefs.getUpdateInterval("100000000"));
 
         return "icon";
     }
@@ -68,8 +69,11 @@ public class MobileIconController {
     @ResourceMapping
     public void getCount(ResourceRequest request, ResourceResponse response) throws IOException {
         String userId = lookupP3PInfo(request, PortletRequest.P3PUserInfos.USER_LOGIN_ID);
-        PortletPreferences preferences = request.getPreferences();
-        String counterService = preferences.getValue("counterService", null);
+
+        MobileIconPrefs prefs = new MobileIconPrefs();
+        prefs.fromPreferences(request);
+
+        String counterService = prefs.getCounterService(null);
         if (counterService != null) {
             PrintWriter writer = response.getWriter();
             writer.write(getCount(counterService, userId, 10000));
@@ -108,9 +112,10 @@ public class MobileIconController {
     @RenderMapping(params = "action=showWidget")
     public String showWidget(RenderRequest request, RenderResponse response, Model model) {
 
-        PortletPreferences preferences = request.getPreferences();
-        String widgetScript = preferences.getValue("widgetScript", "");
-        model.addAttribute("widgetScript", widgetScript);
+        MobileIconPrefs prefs = new MobileIconPrefs();
+        prefs.fromPreferences(request);
+
+        model.addAttribute("widgetScript", prefs.getWidgetScript(""));
 
         return "widget";
     }
