@@ -120,10 +120,11 @@ public class MobileIconEditController implements Serializable {
     }
 
     @ActionMapping(params = {"action=cancel"})
-    public void cancel(ActionResponse response) throws PortletModeException {
+    public void cancel(ActionResponse response) throws PortletModeException, WindowStateException {
         prefs.resetFields();
 
         response.setPortletMode(PortletMode.VIEW);
+        response.setWindowState(LiferayWindowState.NORMAL);
     }
 
     private long lookupCompanyId(PortletRequest request) {
