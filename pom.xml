@@ -18,6 +18,10 @@
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
   <name>${project.artifactId}</name>
+  
+  <properties>
+	<liferay.version>6.0.11</liferay.version>
+  </properties>
 
   <modules>
     <module>core-bc</module>
