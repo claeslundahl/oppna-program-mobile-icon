@@ -7,4 +7,6 @@
 
   <context:component-scan base-package="se.vgregion.mobile.settings.controller" annotation-config="true" />
 
+  <context:property-placeholder location="classpath:spring/mobile-settings.properties" />
+
 </beans>

@@ -14,4 +14,10 @@
 
   <bean id="companyExpandoService" class="se.vgregion.mobile.CompanyExpandoServiceImpl" />
 
+  <bean id="communityExpandoService" class="se.vgregion.mobile.CommunityExpandoServiceImpl" />
+
+  <bean id="layoutLocalService" class="com.liferay.portal.service.LayoutLocalServiceUtil" factory-method="getService"/>
+
+  <bean id="groupLocalService" class="com.liferay.portal.service.GroupLocalServiceUtil" factory-method="getService"/>
+
 </beans>
