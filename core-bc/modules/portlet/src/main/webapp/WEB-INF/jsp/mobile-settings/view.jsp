@@ -16,7 +16,7 @@
     </c:if>
 
     <fieldset>
-        <legend>Mobile styles</legend>
+        <legend>Mobila stil-klasser</legend>
         <table class="lfr-table moblie-settings-table">
             <tr class="moblie-settings-head">
                 <th width="100">Nyckel</th>
@@ -43,6 +43,58 @@
                 <td colspan="4">
                     <a class="add" title="Lägg till Mobile Style" href="${add}">Lägg till</a>
                 </td>
+            </tr>
+        </table>
+    </fieldset>
+    <fieldset>
+        <form:form method="POST" commandName="startPage">
+        <legend>Mobil startsida</legend>
+        <div>
+            <span>${startPage.friendlyUrl}</span>
+            <span>${startPage.expandoKey}</span>
+            <span>
+                <form:select path="layoutId">
+                    <form:options items="${topPages}" itemValue="layoutId" itemLabel="pageTitle"/>
+                </form:select>
+            </span>
+            <span>Spara?</span>
+        </div>
+        </form:form>
+    </fieldset>
+    <fieldset>
+        <legend>Mobil-tema artiklar</legend>
+        <table class="lfr-table moblie-settings-table">
+            <tr class="moblie-settings-head">
+                <th width="100">Flik</th>
+                <th width="100">Nyckel</th>
+                <th width="100">ArtikelId</th>
+                <th width="100">ArtikelNamn</th>
+                <th></th>
+                <th></th>
+            </tr>
+            <tr>
+                <td>Koll på jobbet</td>
+                <td>Expando nyckel</td>
+                <td>Artikel-Id</td>
+                <td>Artikel-namn</td>
+                <td>Sök</td>
+                <td>Ta bort</td>
+            </tr>
+            <tr>
+                <td>Sök</td>
+                <td>Expando nyckel</td>
+                <td>Artikel-Id</td>
+                <td>Artikel-namn</td>
+                <td>Sök</td>
+                <td>Ta bort</td>
+            </tr>
+            <tr>
+                <td>Användare</td>
+                <td>Expando nyckel</td>
+                <td>Artikel-Id</td>
+                <td>Artikel-namn</td>
+                <td>Sök</td>
+                <td>Ta bort</td>
             </tr>
         </table>
     </fieldset>
