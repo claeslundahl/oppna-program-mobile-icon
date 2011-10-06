@@ -30,6 +30,8 @@ import javax.portlet.PortletRequest;
 import javax.portlet.RenderRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by IntelliJ IDEA.
@@ -61,11 +63,12 @@ public class MobileSettingsController {
     public String defaultView(RenderRequest request, Model model) {
         long companyId = lookupCompanyId(request);
         String languageId = lookupLanguageId(request);
+        Long groupId = lookupGroupId(request);
 
         List<MobileIconStyle> mobileIconStyles = lookupMobileIconStyles(companyId);
         model.addAttribute("mobileIconStyles", mobileIconStyles);
 
-        List<MobileStartPage> topPages = lookupMobileStartPages(companyId, languageId);
+        Map<Long, String> topPages = lookupMobileStartPages(companyId, languageId, groupId);
         model.addAttribute("topPages", topPages);
 
         Long layoutId = communityExpandoService.getSetting(MobileStartPage.MOBILE_START_PAGE_KEY, companyId);
@@ -73,7 +76,7 @@ public class MobileSettingsController {
             model.addAttribute("startPage", new MobileStartPage());
         } else {
             try {
-                Layout layout = layoutLocalService.getLayout(layoutId);
+                Layout layout = layoutLocalService.getLayout(groupId, true, layoutId);
                 MobileStartPage startPage = new MobileStartPage();
                 startPage.setLayoutId(layoutId);
                 startPage.setPageTitle(layout.getName(languageId, true));
@@ -90,33 +93,21 @@ public class MobileSettingsController {
         return "view";
     }
 
-    private List<MobileStartPage> lookupMobileStartPages(long companyId, String languageId) {
-        List<MobileStartPage> topPages = new ArrayList<MobileStartPage>();
-
-        Group community = null;
-        try {
-            community = groupLocalService.getGroup(companyId, communityName);
-        } catch (Exception e) {
-            LOGGER.error("Could not find community [" + communityName + "] - Mobile startpage cannot be configured");
-        }
-
-        if (community != null) {
+    private Map<Long, String> lookupMobileStartPages(long companyId, String languageId, Long groupId) {
+        Map<Long, String> topPages = new TreeMap<Long, String>();
+        if (groupId != null) {
             List<Layout> layouts = null;
             try {
-                layouts = layoutLocalService.getLayouts(community.getGroupId(), true, 0L);
+                layouts = layoutLocalService.getLayouts(groupId, true, 0L);
             } catch (SystemException e) {
                 LOGGER.error("Failed to find layouts in community [" + communityName + "] - Mobile startpage cannot be " +
                         "configured");
             }
             if (layouts != null) {
                 for (Layout layout : layouts) {
-                    MobileStartPage topPage = new MobileStartPage();
-                    topPage.setLayoutId(layout.getLayoutId());
-                    topPage.setPageTitle(layout.getName(languageId, true));
-                    topPage.setFriendlyUrl(layout.getFriendlyURL());
-                    topPage.setHidden(layout.isHidden());
+                    String label = layout.getName(languageId, true) + (layout.isHidden() ? " [H]" : "");
 
-                    topPages.add(topPage);
+                    topPages.put(layout.getLayoutId(), label);
                 }
             }
         }
@@ -172,6 +163,21 @@ public class MobileSettingsController {
 
     }
 
+    @ActionMapping("saveMobileStartPage")
+    public void saveMobileStartPage(ActionRequest request,
+            @ModelAttribute MobileStartPage mobileStartPage, Model model) {
+        try {
+            long companyId = lookupCompanyId(request);
+            communityExpandoService.setSetting(mobileStartPage.getExpandoKey()
+                    , mobileStartPage.getLayoutId()
+                    ,companyId);
+
+            model.addAttribute("saveActionStartPage", mobileStartPage.getExpandoKey());
+        } catch (Exception ex) {
+            model.addAttribute("saveActionStartPageFailed", mobileStartPage.getExpandoKey());
+        }
+    }
+
     @ActionMapping("delete")
     public void deleteMobileIconStyle(ActionRequest request, @RequestParam("expandoKey") String expandoKey,
             Model model) {
@@ -189,8 +195,20 @@ public class MobileSettingsController {
         ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
         return themeDisplay.getCompanyId();
     }
+
     private String lookupLanguageId(PortletRequest request) {
         ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
         return themeDisplay.getLanguageId();
+    }
+
+    private Long lookupGroupId(PortletRequest request) {
+        Group community = null;
+        try {
+            community = groupLocalService.getGroup(lookupCompanyId(request), communityName);
+            return community.getGroupId();
+        } catch (Exception e) {
+            LOGGER.error("Could not find community [" + communityName + "] - Mobile startpage cannot be configured");
+        }
+        return null;
     }
 }
