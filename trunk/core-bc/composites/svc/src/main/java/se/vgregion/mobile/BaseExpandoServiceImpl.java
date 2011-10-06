@@ -29,7 +29,7 @@ public class BaseExpandoServiceImpl {
     @Autowired
     protected ExpandoValueLocalService expandoValueService;
 
-    public void setSetting(String targetClassName, String columnName, String value, long companyId, int expandoType) {
+    public void setSetting(String targetClassName, String columnName, Object value, long companyId, int expandoType) {
         try {
             expandoValueService.addValue(companyId, targetClassName, ExpandoTableConstants.DEFAULT_TABLE_NAME,
                     columnName, companyId, value);
@@ -48,12 +48,12 @@ public class BaseExpandoServiceImpl {
         }
     }
 
-    public String getSetting(String targetClassName, String columnName, long companyId) {
+    public Object getSetting(String targetClassName, String columnName, long companyId) {
 
-        String value = "";
+        Object value = null;
         try {
             value = expandoValueService.getData(companyId, targetClassName,
-                    ExpandoTableConstants.DEFAULT_TABLE_NAME, columnName, companyId, "");
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, columnName, companyId);
 
         } catch (PortalException e) {
             throw new RuntimeException(e);
@@ -79,7 +79,7 @@ public class BaseExpandoServiceImpl {
         }
     }
 
-    private void createExpandoColumn(String targetClassName, String columnName, String value, long companyId,
+    private void createExpandoColumn(String targetClassName, String columnName, Object value, long companyId,
             int expandoType) {
 		try {
 			long tableId = expandoTableService.getDefaultTable(companyId, targetClassName).getTableId();
@@ -90,7 +90,7 @@ public class BaseExpandoServiceImpl {
 		}
 	}
 
-	private void createExpandoTabel(String targetClassName, String columnName, String value, long companyId,
+	private void createExpandoTabel(String targetClassName, String columnName, Object value, long companyId,
             int expandoType) {
 		try {
 			expandoTableService.addDefaultTable(companyId, targetClassName);

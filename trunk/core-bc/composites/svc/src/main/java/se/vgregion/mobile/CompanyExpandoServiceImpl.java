@@ -16,7 +16,11 @@ public class CompanyExpandoServiceImpl extends BaseExpandoServiceImpl implements
 
     @Override
     public String getSetting(String columnName, long companyId) {
-        return getSetting(COMPANY_CLASSNAME, columnName, companyId);
+        Object value = getSetting(COMPANY_CLASSNAME, columnName, companyId);
+        if (value == null) {
+            return "";
+        }
+        return (String)value;
     }
 
     @Override

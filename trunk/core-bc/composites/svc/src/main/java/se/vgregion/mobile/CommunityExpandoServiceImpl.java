@@ -13,14 +13,14 @@ import com.liferay.portlet.expando.model.ExpandoColumnConstants;
 public class CommunityExpandoServiceImpl extends BaseExpandoServiceImpl implements CommunityExpandoService {
 
     @Override
-    public void setSetting(String columnName, String value, long companyId) {
+    public void setSetting(String columnName, Long value, long companyId) {
         setSetting(COMMUNITY_CLASSNAME, columnName, value, companyId, EXPANDO_TYPE);
     }
 
     @Override
     public Long getSetting(String columnName, long companyId) {
         try {
-            return new Long(getSetting(COMMUNITY_CLASSNAME, columnName, companyId));
+            return (Long)getSetting(COMMUNITY_CLASSNAME, columnName, companyId);
         } catch (NumberFormatException e) {
             return null;
         }

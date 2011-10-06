@@ -7,7 +7,7 @@ package se.vgregion.mobile;
  * Time: 17:47
  */
 public interface CommunityExpandoService {
-    void setSetting(String columnName, String value, long companyId);
+    void setSetting(String columnName, Long value, long companyId);
 
     Long getSetting(String columnName, long companyId);
 }

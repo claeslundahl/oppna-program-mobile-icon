@@ -6,6 +6,7 @@
 <portlet:renderURL var="add" portletMode="VIEW">
     <portlet:param name="action" value="edit"/>
 </portlet:renderURL>
+<portlet:actionURL var="saveMobileStartPage" name="saveMobileStartPage" portletMode="VIEW"/>
 
 <div class="moblie-settings">
     <c:if test="${removeAction ne null}">
@@ -46,21 +47,37 @@
             </tr>
         </table>
     </fieldset>
+    <br/>
+    <c:if test="${saveActionStartPage ne null}">
+        <div class="portlet-msg-success">Startsida har ändrats [${saveActionStartPage}].</div>
+    </c:if>
+    <c:if test="${saveActionStartPageFailed ne null}">
+        <div class="portlet-msg-error">Ändringen av startsida kunde inte sparats [${saveActionStartPageFailed}].</div>
+    </c:if>
     <fieldset>
-        <form:form method="POST" commandName="startPage">
         <legend>Mobil startsida</legend>
-        <div>
-            <span>${startPage.friendlyUrl}</span>
-            <span>${startPage.expandoKey}</span>
-            <span>
-                <form:select path="layoutId">
-                    <form:options items="${topPages}" itemValue="layoutId" itemLabel="pageTitle"/>
-                </form:select>
-            </span>
-            <span>Spara?</span>
-        </div>
+        <form:form method="POST" action="${saveMobileStartPage}" commandName="startPage">
+            <form:hidden path="expandoKey"/>
+            <table class="lfr-table moblie-settings-table">
+                <tr class="moblie-settings-head">
+                    <th width="100">Nyckel</th>
+                    <th width="100">URL</th>
+                    <th>Vald startsida</th>
+                </tr>
+                <tr>
+                    <td>${startPage.expandoKey}</td>
+                    <td>${startPage.friendlyUrl}</td>
+                    <td>
+                        <form:select path="layoutId" onchange="this.form.submit();">
+                            <form:option value="">-- Ingen sida vald --</form:option>
+                            <form:options items="${topPages}"/>
+                        </form:select>
+                    </td>
+                </tr>
+            </table>
         </form:form>
     </fieldset>
+    <br/>
     <fieldset>
         <legend>Mobil-tema artiklar</legend>
         <table class="lfr-table moblie-settings-table">
