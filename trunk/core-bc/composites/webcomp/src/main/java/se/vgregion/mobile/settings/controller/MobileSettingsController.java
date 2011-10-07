@@ -1,6 +1,5 @@
 package se.vgregion.mobile.settings.controller;
 
-import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Group;
@@ -9,6 +8,13 @@ import com.liferay.portal.service.GroupLocalService;
 import com.liferay.portal.service.LayoutLocalService;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.expando.model.ExpandoColumn;
+import com.liferay.portlet.journal.model.JournalArticle;
+import com.liferay.portlet.journal.model.JournalStructure;
+import com.liferay.portlet.journal.model.JournalTemplate;
+import com.liferay.portlet.journal.service.JournalArticleLocalService;
+import com.liferay.portlet.journal.service.JournalStructureLocalService;
+import com.liferay.portlet.journal.service.JournalTemplateLocalService;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +28,9 @@ import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import se.vgregion.mobile.CommunityExpandoService;
 import se.vgregion.mobile.CompanyExpandoService;
+import se.vgregion.mobile.settings.model.MobileArticle;
 import se.vgregion.mobile.settings.model.MobileIconStyle;
-import se.vgregion.mobile.settings.model.MobileStartPage;
+import se.vgregion.mobile.settings.model.MobilePage;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.PortletRequest;
@@ -56,44 +63,120 @@ public class MobileSettingsController {
     @Autowired
     private GroupLocalService groupLocalService;
 
+    @Autowired
+    private JournalArticleLocalService journalArticleLocalService;
+
+    @Autowired
+    private JournalStructureLocalService journalStructureLocalService;
+
+    @Autowired
+    private JournalTemplateLocalService journalTemplateLocalService;
+
     @Value("${community.name}")
     private String communityName;
+
+    @Value("${public.community.name}")
+    private String publicCommunityName;
 
     @RenderMapping
     public String defaultView(RenderRequest request, Model model) {
         long companyId = lookupCompanyId(request);
         String languageId = lookupLanguageId(request);
         Long groupId = lookupGroupId(request);
+        Long publicGroupId = lookupGroupId(request);
 
         List<MobileIconStyle> mobileIconStyles = lookupMobileIconStyles(companyId);
         model.addAttribute("mobileIconStyles", mobileIconStyles);
 
-        Map<Long, String> topPages = lookupMobileStartPages(companyId, languageId, groupId);
+        Map<Long, String> topPages = lookupTopPages(languageId, groupId);
         model.addAttribute("topPages", topPages);
 
-        Long layoutId = communityExpandoService.getSetting(MobileStartPage.MOBILE_START_PAGE_KEY, companyId);
-        if (layoutId == null) {
-            model.addAttribute("startPage", new MobileStartPage());
-        } else {
-            try {
-                Layout layout = layoutLocalService.getLayout(groupId, true, layoutId);
-                MobileStartPage startPage = new MobileStartPage();
-                startPage.setLayoutId(layoutId);
-                startPage.setPageTitle(layout.getName(languageId, true));
-                startPage.setFriendlyUrl(layout.getFriendlyURL());
-                startPage.setHidden(layout.isHidden());
+        Map<Long, String> publicPages = lookupPublicPages(languageId, publicGroupId);
+        model.addAttribute("publicPages", publicPages);
 
-                model.addAttribute("startPage", startPage);
-            } catch (Exception e) {
-                LOGGER.error("Configured mobile start page cannot be found", e);
-                model.addAttribute("startPage", new MobileStartPage());
-            }
-        }
+        MobilePage startPage = lookupMobileStartPage(companyId, languageId, groupId);
+        model.addAttribute("startPage", startPage);
+
+        MobilePage loginPage = lookupMobileLoginPage(companyId, languageId, groupId);
+        model.addAttribute("loginPage", loginPage);
+
+        MobileArticle workArticle = lookupMobileArticle(companyId, languageId, groupId, MobileArticle.PREFIX + "1");
+        model.addAttribute("workArticle", workArticle);
+        MobileArticle searchArticle = lookupMobileArticle(companyId, languageId, groupId, MobileArticle.PREFIX + "2");
+        model.addAttribute("searchArticle", searchArticle);
+        MobileArticle userArticle = lookupMobileArticle(companyId, languageId, groupId, MobileArticle.PREFIX + "3");
+        model.addAttribute("userArticle", userArticle);
 
         return "view";
     }
 
-    private Map<Long, String> lookupMobileStartPages(long companyId, String languageId, Long groupId) {
+    private MobileArticle lookupMobileArticle(long companyId, String languageId, Long groupId, String expandoKey) {
+        MobileArticle article = new MobileArticle(expandoKey);
+        try {
+            String articleId = communityExpandoService.getStringSetting(expandoKey, companyId);
+
+            if (articleId != null) {
+                JournalArticle journalArticle = journalArticleLocalService.getLatestArticle(groupId, articleId);
+                article.setArticleId(articleId);
+                article.setVersion(journalArticle.getVersion());
+                article.setArticleName(journalArticle.getTitle());
+
+                String structureId = journalArticle.getStructureId();
+                if (StringUtils.isNotBlank(structureId)) {
+                    JournalStructure journalStructure = journalStructureLocalService.getStructure(groupId,
+                            structureId);
+                    article.setStructureName(journalStructure.getName());
+                }
+
+                String tempaleId = journalArticle.getTemplateId();
+                if (StringUtils.isNotBlank(structureId)) {
+                    JournalTemplate journalTemplate = journalTemplateLocalService.getTemplate(groupId,
+                            tempaleId);
+                    article.setTemplateName(journalTemplate.getName());
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.error("Configured article cannot be found", e);
+        }
+
+        return article;
+    }
+
+    private MobilePage lookupMobileStartPage(long companyId, String languageId, Long groupId) {
+        MobilePage startPage = new MobilePage(MobilePage.MOBILE_START_PAGE_KEY);
+        try {
+            Long layoutId = communityExpandoService.getLongSetting(MobilePage.MOBILE_START_PAGE_KEY, companyId);
+            if (layoutId != null) {
+                Layout layout = layoutLocalService.getLayout(groupId, true, layoutId);
+                startPage.setLayoutId(layoutId);
+                startPage.setPageTitle(layout.getName(languageId, true));
+                startPage.setFriendlyUrl(layout.getFriendlyURL());
+                startPage.setHidden(layout.isHidden());
+            }
+        } catch (Exception e) {
+            LOGGER.error("Configured mobile start page cannot be found", e);
+        }
+        return startPage;
+    }
+
+    private MobilePage lookupMobileLoginPage(long companyId, String languageId, Long groupId) {
+        MobilePage loginPage = new MobilePage(MobilePage.MOBILE_LOGIN_PAGE_KEY);
+        try {
+            Long layoutId = communityExpandoService.getLongSetting(MobilePage.MOBILE_LOGIN_PAGE_KEY, companyId);
+            if (layoutId != null) {
+                Layout layout = layoutLocalService.getLayout(groupId, true, layoutId);
+                loginPage.setLayoutId(layoutId);
+                loginPage.setPageTitle(layout.getName(languageId, true));
+                loginPage.setFriendlyUrl(layout.getFriendlyURL());
+                loginPage.setHidden(layout.isHidden());
+            }
+        } catch (Exception e) {
+            LOGGER.error("Configured mobile start page cannot be found", e);
+        }
+        return loginPage;
+    }
+
+    private Map<Long, String> lookupTopPages(String languageId, Long groupId) {
         Map<Long, String> topPages = new TreeMap<Long, String>();
         if (groupId != null) {
             List<Layout> layouts = null;
@@ -101,6 +184,29 @@ public class MobileSettingsController {
                 layouts = layoutLocalService.getLayouts(groupId, true, 0L);
             } catch (SystemException e) {
                 LOGGER.error("Failed to find layouts in community [" + communityName + "] - Mobile startpage cannot be " +
+                        "configured");
+            }
+            if (layouts != null) {
+                for (Layout layout : layouts) {
+                    String label = layout.getName(languageId, true) + (layout.isHidden() ? " [H]" : "");
+
+                    topPages.put(layout.getLayoutId(), label);
+                }
+            }
+        }
+
+        return topPages;
+    }
+
+    private Map<Long, String> lookupPublicPages(String languageId, Long groupId) {
+        Map<Long, String> topPages = new TreeMap<Long, String>();
+        if (groupId != null) {
+            List<Layout> layouts = null;
+            try {
+                layouts = layoutLocalService.getLayouts(groupId, false, 0L);
+            } catch (SystemException e) {
+                LOGGER.error("Failed to find layouts in community [" + communityName + "] - Mobile loginpage cannot " +
+                        "be " +
                         "configured");
             }
             if (layouts != null) {
@@ -158,23 +264,40 @@ public class MobileSettingsController {
 
             model.addAttribute("saveAction", mobileIconStyle.getKey());
         } catch (Exception ex) {
+            LOGGER.error("saveMobileIconStyle", ex);
             model.addAttribute("saveActionFailed", mobileIconStyle.getKey());
         }
-
     }
 
-    @ActionMapping("saveMobileStartPage")
+    @ActionMapping("saveMobilePage")
     public void saveMobileStartPage(ActionRequest request,
-            @ModelAttribute MobileStartPage mobileStartPage, Model model) {
+            @ModelAttribute MobilePage mobilePage, Model model) {
         try {
             long companyId = lookupCompanyId(request);
-            communityExpandoService.setSetting(mobileStartPage.getExpandoKey()
-                    , mobileStartPage.getLayoutId()
-                    ,companyId);
+            communityExpandoService.setSetting(mobilePage.getExpandoKey()
+                    , mobilePage.getLayoutId()
+                    , companyId);
 
-            model.addAttribute("saveActionStartPage", mobileStartPage.getExpandoKey());
+            model.addAttribute("saveActionPage", mobilePage.getExpandoKey());
         } catch (Exception ex) {
-            model.addAttribute("saveActionStartPageFailed", mobileStartPage.getExpandoKey());
+            LOGGER.error("saveMobilePage", ex);
+            model.addAttribute("saveActionPageFailed", mobilePage.getExpandoKey());
+        }
+    }
+
+    @ActionMapping("saveMobileArticle")
+    public void saveMobileArticle(ActionRequest request,
+            @ModelAttribute MobileArticle mobileArticle, Model model) {
+        try {
+            long companyId = lookupCompanyId(request);
+            communityExpandoService.setSetting(mobileArticle.getExpandoKey()
+                    , mobileArticle.getArticleId()
+                    , companyId);
+
+            model.addAttribute("saveActionArticle", mobileArticle.getExpandoKey());
+        } catch (Exception ex) {
+            LOGGER.error("saveMobileArticle", ex);
+            model.addAttribute("saveActionArticleFailed", mobileArticle.getExpandoKey());
         }
     }
 
@@ -211,4 +334,17 @@ public class MobileSettingsController {
         }
         return null;
     }
+
+    private Long lookupPublicGroupId(PortletRequest request) {
+        Group community = null;
+        try {
+            community = groupLocalService.getGroup(lookupCompanyId(request), publicCommunityName);
+            return community.getGroupId();
+        } catch (Exception e) {
+            LOGGER.error("Could not find community [" + publicCommunityName + "] - Mobile loginpage cannot be " +
+                    "configured");
+        }
+        return null;
+    }
+
 }

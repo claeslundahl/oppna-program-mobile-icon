@@ -3,11 +3,13 @@ package se.vgregion.mobile;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portlet.expando.model.ExpandoColumn;
-import com.liferay.portlet.expando.model.ExpandoColumnConstants;
+import com.liferay.portlet.expando.model.ExpandoTable;
 import com.liferay.portlet.expando.model.ExpandoTableConstants;
 import com.liferay.portlet.expando.service.ExpandoColumnLocalService;
 import com.liferay.portlet.expando.service.ExpandoTableLocalService;
 import com.liferay.portlet.expando.service.ExpandoValueLocalService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.List;
  * Time: 17:32
  */
 public class BaseExpandoServiceImpl {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseExpandoServiceImpl.class);
 
     @Autowired
     protected ExpandoColumnLocalService expandoColumnService;
@@ -33,18 +36,10 @@ public class BaseExpandoServiceImpl {
         try {
             expandoValueService.addValue(companyId, targetClassName, ExpandoTableConstants.DEFAULT_TABLE_NAME,
                     columnName, companyId, value);
-        } catch (PortalException e) {
-            // If table don't exists we try to create it.
-            if (e instanceof com.liferay.portlet.expando.NoSuchTableException) {
-                createExpandoTabel(targetClassName, columnName, value, companyId, expandoType);
-            } else if (e instanceof com.liferay.portlet.expando.NoSuchColumnException) {
-                // If column don't exists we try to create it.
-                createExpandoColumn(targetClassName, columnName, value, companyId, expandoType);
-            } else {
-                throw new RuntimeException(e);
-            }
-        } catch (SystemException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            LOGGER.error("setSetting", e);
+            createIfNeeded(companyId, targetClassName, columnName, expandoType);
+            setSetting(targetClassName, columnName, value, companyId, expandoType);
         }
     }
 
@@ -67,6 +62,7 @@ public class BaseExpandoServiceImpl {
         try {
             return expandoColumnService.getDefaultTableColumns(companyId, targetClassName);
         } catch (SystemException e) {
+            LOGGER.error("getAllKeys", e);
             throw new RuntimeException(e);
         }
     }
@@ -75,29 +71,50 @@ public class BaseExpandoServiceImpl {
         try {
             expandoColumnService.deleteColumn(companyId, targetClassName, ExpandoTableConstants.DEFAULT_TABLE_NAME, columnName);
         } catch (Exception e) {
+            LOGGER.error("delete", e);
             throw new RuntimeException(e);
         }
     }
 
-    private void createExpandoColumn(String targetClassName, String columnName, Object value, long companyId,
-            int expandoType) {
+    private ExpandoColumn createExpandoColumn(long tableId, String columnName, int expandoType) {
 		try {
-			long tableId = expandoTableService.getDefaultTable(companyId, targetClassName).getTableId();
-			expandoColumnService.addColumn(tableId, columnName, expandoType);
-			setSetting(targetClassName, columnName, value, companyId, expandoType);
+			return expandoColumnService.addColumn(tableId, columnName, expandoType);
 		} catch (Exception e) {
+            LOGGER.error("createExpandoColumn", e);
 			throw new RuntimeException(e);
 		}
 	}
 
-	private void createExpandoTabel(String targetClassName, String columnName, Object value, long companyId,
-            int expandoType) {
-		try {
-			expandoTableService.addDefaultTable(companyId, targetClassName);
-			setSetting(targetClassName, columnName, value, companyId, expandoType);
+	private ExpandoTable createExpandoTable(long companyId, String targetClassName) {
+        try {
+			return expandoTableService.addDefaultTable(companyId, targetClassName);
 		} catch (Exception e) {
+            LOGGER.error("createExpandoTable", e);
 			throw new RuntimeException(e);
 		}
 	}
 
+    private void createIfNeeded(long companyId, String targetClassName, String columnName, int expandoType) {
+        ExpandoTable expandoTable = null;
+        try {
+            expandoTable = expandoTableService.getDefaultTable(companyId, targetClassName);
+        } catch (PortalException e) {
+            if (e instanceof com.liferay.portlet.expando.NoSuchTableException) {
+                expandoTable = createExpandoTable(companyId, targetClassName);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create ExpandoTable ["+targetClassName+"]", e);
+        }
+
+        try {
+            expandoColumnService.getColumn(expandoTable.getTableId(), columnName);
+        } catch (PortalException e) {
+            if (e instanceof com.liferay.portlet.expando.NoSuchColumnException) {
+                // If column don't exists we try to create it.
+                createExpandoColumn(expandoTable.getTableId(), columnName, expandoType);
+            }
+        } catch (SystemException e) {
+            throw new RuntimeException("Failed to create ExpandoColumn ["+columnName+"]", e);
+        }
+    }
 }

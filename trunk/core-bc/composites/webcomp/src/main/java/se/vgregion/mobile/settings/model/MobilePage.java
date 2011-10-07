@@ -6,27 +6,29 @@ package se.vgregion.mobile.settings.model;
  * Date: 5/10-11
  * Time: 15:53
  */
-public class MobileStartPage {
+public class MobilePage {
     public static final String MOBILE_START_PAGE_KEY = "MOBILE_START_PAGE";
+    public static final String MOBILE_LOGIN_PAGE_KEY = "MOBILE_LOGIN_PAGE";
 
-    private String expandoKey = MOBILE_START_PAGE_KEY;
+    private String expandoKey;
     private Long layoutId;
     private String friendlyUrl;
     private String pageTitle;
     private boolean hidden;
 
-    public MobileStartPage() {
+    public MobilePage() {
     }
 
-    public MobileStartPage(Long layoutId, String pageTitle, String friendlyUrl, boolean hidden) {
-        this.friendlyUrl = friendlyUrl;
-        this.layoutId = layoutId;
-        this.pageTitle = pageTitle;
-        this.hidden = hidden;
+    public MobilePage(String expandoKey) {
+        this.expandoKey = expandoKey;
     }
 
     public String getExpandoKey() {
         return expandoKey;
+    }
+
+    public void setExpandoKey(String expandoKey) {
+        this.expandoKey = expandoKey;
     }
 
     public String getFriendlyUrl() {
@@ -66,7 +68,7 @@ public class MobileStartPage {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        MobileStartPage that = (MobileStartPage) o;
+        MobilePage that = (MobilePage) o;
 
         if (layoutId != null ? !layoutId.equals(that.layoutId) : that.layoutId != null) return false;
 

@@ -9,5 +9,9 @@ package se.vgregion.mobile;
 public interface CommunityExpandoService {
     void setSetting(String columnName, Long value, long companyId);
 
-    Long getSetting(String columnName, long companyId);
+    void setSetting(String columnName, String value, long companyId);
+
+    Long getLongSetting(String columnName, long companyId);
+
+    String getStringSetting(String columnName, long companyId);
 }

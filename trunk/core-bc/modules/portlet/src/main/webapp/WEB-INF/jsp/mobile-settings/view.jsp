@@ -6,7 +6,8 @@
 <portlet:renderURL var="add" portletMode="VIEW">
     <portlet:param name="action" value="edit"/>
 </portlet:renderURL>
-<portlet:actionURL var="saveMobileStartPage" name="saveMobileStartPage" portletMode="VIEW"/>
+<portlet:actionURL var="saveMobilePage" name="saveMobilePage" portletMode="VIEW"/>
+<portlet:actionURL var="saveMobileArticle" name="saveMobileArticle" portletMode="VIEW"/>
 
 <div class="moblie-settings">
     <c:if test="${removeAction ne null}">
@@ -48,22 +49,22 @@
         </table>
     </fieldset>
     <br/>
-    <c:if test="${saveActionStartPage ne null}">
-        <div class="portlet-msg-success">Startsida har ändrats [${saveActionStartPage}].</div>
+    <c:if test="${saveActionPage ne null}">
+        <div class="portlet-msg-success">Sida har ändrats [${saveActionPage}].</div>
     </c:if>
-    <c:if test="${saveActionStartPageFailed ne null}">
-        <div class="portlet-msg-error">Ändringen av startsida kunde inte sparats [${saveActionStartPageFailed}].</div>
+    <c:if test="${saveActionPageFailed ne null}">
+        <div class="portlet-msg-error">Ändringen av sida kunde inte sparats [${saveActionPageFailed}].</div>
     </c:if>
     <fieldset>
-        <legend>Mobil startsida</legend>
-        <form:form method="POST" action="${saveMobileStartPage}" commandName="startPage">
-            <form:hidden path="expandoKey"/>
-            <table class="lfr-table moblie-settings-table">
-                <tr class="moblie-settings-head">
-                    <th width="100">Nyckel</th>
-                    <th width="100">URL</th>
-                    <th>Vald startsida</th>
-                </tr>
+        <legend>Mobil sidor</legend>
+        <table class="lfr-table moblie-settings-table">
+            <tr class="moblie-settings-head">
+                <th width="100">Nyckel</th>
+                <th width="100">URL</th>
+                <th>Vald startsida</th>
+            </tr>
+            <form:form method="POST" action="${saveMobilePage}" commandName="startPage">
+                <form:hidden path="expandoKey"/>
                 <tr>
                     <td>${startPage.expandoKey}</td>
                     <td>${startPage.friendlyUrl}</td>
@@ -74,8 +75,21 @@
                         </form:select>
                     </td>
                 </tr>
-            </table>
-        </form:form>
+            </form:form>
+            <form:form method="POST" action="${saveMobilePage}" commandName="loginPage">
+                <form:hidden path="expandoKey"/>
+                <tr>
+                    <td>${loginPage.expandoKey}</td>
+                    <td>${loginPage.friendlyUrl}</td>
+                    <td>
+                        <form:select path="layoutId" onchange="this.form.submit();">
+                            <form:option value="">-- Ingen sida vald --</form:option>
+                            <form:options items="${publicPages}"/>
+                        </form:select>
+                    </td>
+                </tr>
+            </form:form>
+        </table>
     </fieldset>
     <br/>
     <fieldset>
@@ -84,34 +98,52 @@
             <tr class="moblie-settings-head">
                 <th width="100">Flik</th>
                 <th width="100">Nyckel</th>
-                <th width="100">ArtikelId</th>
+                <th width="50">ArtikelId</th>
+                <th width="50">Version</th>
                 <th width="100">ArtikelNamn</th>
+                <th width="100">Structure</th>
+                <th width="100">Template</th>
                 <th></th>
                 <th></th>
             </tr>
             <tr>
-                <td>Koll på jobbet</td>
-                <td>Expando nyckel</td>
-                <td>Artikel-Id</td>
-                <td>Artikel-namn</td>
-                <td>Sök</td>
-                <td>Ta bort</td>
+                <form:form method="POST" action="${saveMobileArticle}" commandName="workArticle">
+                    <form:hidden path="expandoKey"/>
+                    <td>Koll på jobbet</td>
+                    <td>${workArticle.expandoKey}</td>
+                    <td><form:input path="articleId"/></td>
+                    <td>${workArticle.version}</td>
+                    <td>${workArticle.articleName}</td>
+                    <td>${workArticle.structureName}</td>
+                    <td>${workArticle.templateName}</td>
+                    <td><input type="submit" value="Spara"/></td>
+                </form:form>
             </tr>
             <tr>
-                <td>Sök</td>
-                <td>Expando nyckel</td>
-                <td>Artikel-Id</td>
-                <td>Artikel-namn</td>
-                <td>Sök</td>
-                <td>Ta bort</td>
+                <form:form method="POST" action="${saveMobileArticle}" commandName="searchArticle">
+                    <form:hidden path="expandoKey"/>
+                    <td>Sök</td>
+                    <td>${searchArticle.expandoKey}</td>
+                    <td><form:input path="articleId"/></td>
+                    <td>${searchArticle.version}</td>
+                    <td>${searchArticle.articleName}</td>
+                    <td>${searchArticle.structureName}</td>
+                    <td>${searchArticle.templateName}</td>
+                    <td><input type="submit" value="Spara"/></td>
+                </form:form>
             </tr>
             <tr>
-                <td>Användare</td>
-                <td>Expando nyckel</td>
-                <td>Artikel-Id</td>
-                <td>Artikel-namn</td>
-                <td>Sök</td>
-                <td>Ta bort</td>
+                <form:form method="POST" action="${saveMobileArticle}" commandName="userArticle">
+                    <form:hidden path="expandoKey"/>
+                    <td>Användare</td>
+                    <td>${userArticle.expandoKey}</td>
+                    <td><form:input path="articleId"/></td>
+                    <td>${userArticle.version}</td>
+                    <td>${userArticle.articleName}</td>
+                    <td>${userArticle.structureName}</td>
+                    <td>${userArticle.templateName}</td>
+                    <td><input type="submit" value="Spara"/></td>
+                </form:form>
             </tr>
         </table>
     </fieldset>
