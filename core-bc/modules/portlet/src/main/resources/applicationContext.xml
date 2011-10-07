@@ -20,4 +20,15 @@
 
   <bean id="groupLocalService" class="com.liferay.portal.service.GroupLocalServiceUtil" factory-method="getService"/>
 
+  <bean id="journalArticleLocalService" class="com.liferay.portlet.journal.service.JournalArticleLocalServiceUtil"
+        factory-method="getService" />
+
+  <bean id="journalStructureLocalService" class="com.liferay.portlet.journal.service.JournalStructureLocalServiceUtil"
+        factory-method="getService" />
+
+  <bean id="journalTemplateLocalService" class="com.liferay.portlet.journal.service.JournalTemplateLocalServiceUtil"
+        factory-method="getService" />
+
+
+
 </beans>

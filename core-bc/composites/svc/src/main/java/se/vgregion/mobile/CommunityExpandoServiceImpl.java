@@ -14,19 +14,32 @@ public class CommunityExpandoServiceImpl extends BaseExpandoServiceImpl implemen
 
     @Override
     public void setSetting(String columnName, Long value, long companyId) {
-        setSetting(COMMUNITY_CLASSNAME, columnName, value, companyId, EXPANDO_TYPE);
+        setSetting(COMMUNITY_CLASSNAME, columnName, value, companyId, ExpandoColumnConstants.LONG);
     }
 
     @Override
-    public Long getSetting(String columnName, long companyId) {
+    public void setSetting(String columnName, String value, long companyId) {
+        setSetting(COMMUNITY_CLASSNAME, columnName, value, companyId, ExpandoColumnConstants.STRING);
+    }
+
+    @Override
+    public Long getLongSetting(String columnName, long companyId) {
         try {
             return (Long)getSetting(COMMUNITY_CLASSNAME, columnName, companyId);
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             return null;
         }
     }
 
+    @Override
+    public String getStringSetting(String columnName, long companyId) {
+        try {
+            return (String)getSetting(COMMUNITY_CLASSNAME, columnName, companyId);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
     private final static String COMMUNITY_CLASSNAME = Group.class.getName();
-    private static final int EXPANDO_TYPE = ExpandoColumnConstants.LONG;
 
 }
