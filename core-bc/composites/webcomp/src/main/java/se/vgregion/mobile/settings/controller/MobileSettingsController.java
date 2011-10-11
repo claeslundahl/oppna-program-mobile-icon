@@ -72,10 +72,10 @@ public class MobileSettingsController {
     @Autowired
     private JournalTemplateLocalService journalTemplateLocalService;
 
-    @Value("${community.name}")
+    @Value("${mobile.community.name}")
     private String communityName;
 
-    @Value("${public.community.name}")
+    @Value("${public.mobile.community.name}")
     private String publicCommunityName;
 
     @RenderMapping
