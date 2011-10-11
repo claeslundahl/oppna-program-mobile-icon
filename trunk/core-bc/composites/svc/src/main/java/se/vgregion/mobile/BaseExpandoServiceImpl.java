@@ -32,23 +32,23 @@ public class BaseExpandoServiceImpl {
     @Autowired
     protected ExpandoValueLocalService expandoValueService;
 
-    public void setSetting(String targetClassName, String columnName, Object value, long companyId, int expandoType) {
+    public void setSetting(String targetClassName, String columnName, Object value, long companyId, long classPK, int expandoType) {
         try {
             expandoValueService.addValue(companyId, targetClassName, ExpandoTableConstants.DEFAULT_TABLE_NAME,
-                    columnName, companyId, value);
+                    columnName, classPK, value);
         } catch (Exception e) {
             LOGGER.error("setSetting", e);
             createIfNeeded(companyId, targetClassName, columnName, expandoType);
-            setSetting(targetClassName, columnName, value, companyId, expandoType);
+            setSetting(targetClassName, columnName, value, companyId, classPK, expandoType);
         }
     }
 
-    public Object getSetting(String targetClassName, String columnName, long companyId) {
+    public Object getSetting(long companyId, String targetClassName, String columnName, long classPK) {
 
         Object value = null;
         try {
             value = expandoValueService.getData(companyId, targetClassName,
-                    ExpandoTableConstants.DEFAULT_TABLE_NAME, columnName, companyId);
+                    ExpandoTableConstants.DEFAULT_TABLE_NAME, columnName, classPK);
 
         } catch (PortalException e) {
             throw new RuntimeException(e);

@@ -13,28 +13,28 @@ import com.liferay.portlet.expando.model.ExpandoColumnConstants;
 public class CommunityExpandoServiceImpl extends BaseExpandoServiceImpl implements CommunityExpandoService {
 
     @Override
-    public void setSetting(String columnName, Long value, long companyId) {
-        setSetting(COMMUNITY_CLASSNAME, columnName, value, companyId, ExpandoColumnConstants.LONG);
+    public void setSetting(String columnName, Long value, long companyId, long communityId) {
+        setSetting(COMMUNITY_CLASSNAME, columnName, value, companyId, communityId, ExpandoColumnConstants.LONG);
     }
 
     @Override
-    public void setSetting(String columnName, String value, long companyId) {
-        setSetting(COMMUNITY_CLASSNAME, columnName, value, companyId, ExpandoColumnConstants.STRING);
+    public void setSetting(String columnName, String value, long companyId, long communityId) {
+        setSetting(COMMUNITY_CLASSNAME, columnName, value, companyId, communityId, ExpandoColumnConstants.STRING);
     }
 
     @Override
-    public Long getLongSetting(String columnName, long companyId) {
+    public Long getLongSetting(String columnName, long companyId, long communityId) {
         try {
-            return (Long)getSetting(COMMUNITY_CLASSNAME, columnName, companyId);
+            return (Long)getSetting(companyId, COMMUNITY_CLASSNAME, columnName, communityId);
         } catch (Exception e) {
             return null;
         }
     }
 
     @Override
-    public String getStringSetting(String columnName, long companyId) {
+    public String getStringSetting(String columnName, long companyId, long communityId) {
         try {
-            return (String)getSetting(COMMUNITY_CLASSNAME, columnName, companyId);
+            return (String)getSetting(companyId, COMMUNITY_CLASSNAME, columnName, communityId);
         } catch (Exception e) {
             return "";
         }

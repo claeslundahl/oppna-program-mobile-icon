@@ -113,7 +113,7 @@ public class MobileSettingsController {
     private MobileArticle lookupMobileArticle(long companyId, String languageId, Long groupId, String expandoKey) {
         MobileArticle article = new MobileArticle(expandoKey);
         try {
-            String articleId = communityExpandoService.getStringSetting(expandoKey, companyId);
+            String articleId = communityExpandoService.getStringSetting(expandoKey, companyId, groupId);
 
             if (articleId != null) {
                 JournalArticle journalArticle = journalArticleLocalService.getLatestArticle(groupId, articleId);
@@ -145,7 +145,7 @@ public class MobileSettingsController {
     private MobilePage lookupMobileStartPage(long companyId, String languageId, Long groupId) {
         MobilePage startPage = new MobilePage(MobilePage.MOBILE_START_PAGE_KEY);
         try {
-            Long layoutId = communityExpandoService.getLongSetting(MobilePage.MOBILE_START_PAGE_KEY, companyId);
+            Long layoutId = communityExpandoService.getLongSetting(MobilePage.MOBILE_START_PAGE_KEY, companyId, groupId);
             if (layoutId != null) {
                 Layout layout = layoutLocalService.getLayout(groupId, true, layoutId);
                 startPage.setLayoutId(layoutId);
@@ -162,7 +162,7 @@ public class MobileSettingsController {
     private MobilePage lookupMobileLoginPage(long companyId, String languageId, Long groupId) {
         MobilePage loginPage = new MobilePage(MobilePage.MOBILE_LOGIN_PAGE_KEY);
         try {
-            Long layoutId = communityExpandoService.getLongSetting(MobilePage.MOBILE_LOGIN_PAGE_KEY, companyId);
+            Long layoutId = communityExpandoService.getLongSetting(MobilePage.MOBILE_LOGIN_PAGE_KEY, companyId, groupId);
             if (layoutId != null) {
                 Layout layout = layoutLocalService.getLayout(groupId, true, layoutId);
                 loginPage.setLayoutId(layoutId);
@@ -274,9 +274,10 @@ public class MobileSettingsController {
             @ModelAttribute MobilePage mobilePage, Model model) {
         try {
             long companyId = lookupCompanyId(request);
+            long groupId = lookupGroupId(request);
             communityExpandoService.setSetting(mobilePage.getExpandoKey()
                     , mobilePage.getLayoutId()
-                    , companyId);
+                    , companyId, groupId);
 
             model.addAttribute("saveActionPage", mobilePage.getExpandoKey());
         } catch (Exception ex) {
@@ -290,9 +291,10 @@ public class MobileSettingsController {
             @ModelAttribute MobileArticle mobileArticle, Model model) {
         try {
             long companyId = lookupCompanyId(request);
+            long groupId = lookupGroupId(request);
             communityExpandoService.setSetting(mobileArticle.getExpandoKey()
                     , mobileArticle.getArticleId()
-                    , companyId);
+                    , companyId, groupId);
 
             model.addAttribute("saveActionArticle", mobileArticle.getExpandoKey());
         } catch (Exception ex) {

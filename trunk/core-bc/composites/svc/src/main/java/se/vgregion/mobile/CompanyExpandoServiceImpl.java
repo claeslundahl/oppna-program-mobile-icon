@@ -11,12 +11,12 @@ public class CompanyExpandoServiceImpl extends BaseExpandoServiceImpl implements
 
 	@Override
     public void setSetting(String columnName, String value, long companyId) {
-        setSetting(COMPANY_CLASSNAME, columnName, value, companyId, EXPANDO_TYPE);
+        setSetting(COMPANY_CLASSNAME, columnName, value, companyId, companyId, EXPANDO_TYPE);
 	}
 
     @Override
     public String getSetting(String columnName, long companyId) {
-        Object value = getSetting(COMPANY_CLASSNAME, columnName, companyId);
+        Object value = getSetting(companyId, COMPANY_CLASSNAME, columnName, companyId);
         if (value == null) {
             return "";
         }
