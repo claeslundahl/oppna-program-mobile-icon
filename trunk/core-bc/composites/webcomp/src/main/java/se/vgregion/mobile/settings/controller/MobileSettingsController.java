@@ -83,7 +83,7 @@ public class MobileSettingsController {
         long companyId = lookupCompanyId(request);
         String languageId = lookupLanguageId(request);
         Long groupId = lookupGroupId(request);
-        Long publicGroupId = lookupGroupId(request);
+        Long publicGroupId = lookupPublicGroupId(request);
 
         List<MobileIconStyle> mobileIconStyles = lookupMobileIconStyles(companyId);
         model.addAttribute("mobileIconStyles", mobileIconStyles);
