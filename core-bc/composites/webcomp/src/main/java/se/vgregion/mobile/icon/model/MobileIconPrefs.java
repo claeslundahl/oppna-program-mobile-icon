@@ -1,7 +1,5 @@
 package se.vgregion.mobile.icon.model;
 
-import org.apache.commons.lang.StringUtils;
-
 import javax.portlet.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -17,11 +15,10 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 public class MobileIconPrefs {
 
     private String title;
-    private String imageId;
     private String iconStyle;
     private String targetUrl;
     private String target;
-    private String widgetScript;
+    private String widgetUrl;
     private String counterService;
     private String updateInterval;
 
@@ -29,9 +26,8 @@ public class MobileIconPrefs {
         setTitle(request.getParameter("title"));
         setTargetUrl(request.getParameter("targetUrl"));
         setTarget(request.getParameter("target"));
-        setImageId(request.getParameter("imageId"));
         setIconStyle(request.getParameter("iconStyle"));
-        setWidgetScript(request.getParameter("widgetScript"));
+        setWidgetUrl(request.getParameter("widgetUrl"));
         setCounterService(request.getParameter("counterService"));
         setUpdateInterval(request.getParameter("updateInterval"));
     }
@@ -40,9 +36,8 @@ public class MobileIconPrefs {
         setTitle(fetchField("title", request));
         setTargetUrl(fetchField("targetUrl", request));
         setTarget(fetchField("target", request));
-        setImageId(fetchField("imageId", request));
         setIconStyle(fetchField("iconStyle", request));
-        setWidgetScript(fetchField("widgetScript", request));
+        setWidgetUrl(fetchField("widgetUrl", request));
         setCounterService(fetchField("counterService", request));
         setUpdateInterval(fetchField("updateInterval", request));
     }
@@ -51,20 +46,18 @@ public class MobileIconPrefs {
         setTitle(null);
         setTargetUrl(null);
         setTarget(null);
-        setImageId(null);
         setIconStyle(null);
-        setWidgetScript(null);
+        setWidgetUrl(null);
         setCounterService(null);
         setUpdateInterval(null);
     }
 
     public void store(PortletPreferences preferences) throws ReadOnlyException, ValidatorException, IOException {
         preferences.setValue("title", getTitle());
-        preferences.setValue("imageId", getImageId());
         preferences.setValue("iconStyle", getIconStyle());
         preferences.setValue("targetUrl", getTargetUrl());
         preferences.setValue("target", getTarget());
-        preferences.setValue("widgetScript", getWidgetScript());
+        preferences.setValue("widgetUrl", getWidgetUrl());
         preferences.setValue("counterService", getCounterService());
         preferences.setValue("updateInterval", getUpdateInterval());
         preferences.store();
@@ -92,14 +85,6 @@ public class MobileIconPrefs {
 
     public void setIconStyle(String iconStyle) {
         this.iconStyle = iconStyle;
-    }
-
-    public String getImageId() {
-        return imageId;
-    }
-
-    public void setImageId(String imageId) {
-        this.imageId = imageId;
     }
 
     public String getTarget() {
@@ -150,16 +135,16 @@ public class MobileIconPrefs {
         this.updateInterval = updateInterval;
     }
 
-    public String getWidgetScript() {
-        return widgetScript;
+    public String getWidgetUrl() {
+        return widgetUrl;
     }
 
-    public String getWidgetScript(String defaultWidgetScript) {
-        return isBlank(widgetScript) ? defaultWidgetScript : widgetScript;
+    public String getWidgetUrl(String defaultWidgetUrl) {
+        return isBlank(widgetUrl) ? defaultWidgetUrl : widgetUrl;
     }
 
-    public void setWidgetScript(String widgetScript) {
-        this.widgetScript = widgetScript;
+    public void setWidgetUrl(String widgetUrl) {
+        this.widgetUrl = widgetUrl;
     }
 
     @Override
@@ -172,13 +157,12 @@ public class MobileIconPrefs {
         if (counterService != null ? !counterService.equals(that.counterService) : that.counterService != null)
             return false;
         if (iconStyle != null ? !iconStyle.equals(that.iconStyle) : that.iconStyle != null) return false;
-        if (imageId != null ? !imageId.equals(that.imageId) : that.imageId != null) return false;
         if (target != null ? !target.equals(that.target) : that.target != null) return false;
         if (targetUrl != null ? !targetUrl.equals(that.targetUrl) : that.targetUrl != null) return false;
         if (title != null ? !title.equals(that.title) : that.title != null) return false;
         if (updateInterval != null ? !updateInterval.equals(that.updateInterval) : that.updateInterval != null)
             return false;
-        if (widgetScript != null ? !widgetScript.equals(that.widgetScript) : that.widgetScript != null) return false;
+        if (widgetUrl != null ? !widgetUrl.equals(that.widgetUrl) : that.widgetUrl != null) return false;
 
         return true;
     }
@@ -186,11 +170,10 @@ public class MobileIconPrefs {
     @Override
     public int hashCode() {
         int result = title != null ? title.hashCode() : 0;
-        result = 31 * result + (imageId != null ? imageId.hashCode() : 0);
         result = 31 * result + (iconStyle != null ? iconStyle.hashCode() : 0);
         result = 31 * result + (targetUrl != null ? targetUrl.hashCode() : 0);
         result = 31 * result + (target != null ? target.hashCode() : 0);
-        result = 31 * result + (widgetScript != null ? widgetScript.hashCode() : 0);
+        result = 31 * result + (widgetUrl != null ? widgetUrl.hashCode() : 0);
         result = 31 * result + (counterService != null ? counterService.hashCode() : 0);
         result = 31 * result + (updateInterval != null ? updateInterval.hashCode() : 0);
         return result;

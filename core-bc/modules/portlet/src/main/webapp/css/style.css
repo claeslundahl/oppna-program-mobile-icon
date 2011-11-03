@@ -23,3 +23,15 @@ a.buttonlink:hover {
     color: #336699;
     text-decoration: none;
 }
+
+#editMobileIconTable td {
+    padding: 5px;
+}
+
+.odd-row {
+    background-color: #D1D6DC;
+}
+
+.even-row {
+
+}

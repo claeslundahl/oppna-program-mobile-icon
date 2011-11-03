@@ -1,16 +1,10 @@
 package se.vgregion.mobile.icon.controller;
 
-import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.messaging.MessageBusUtil;
 import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.theme.ThemeDisplay;
 import com.liferay.portlet.expando.model.ExpandoColumn;
-import com.liferay.portlet.imagegallery.model.IGFolder;
-import com.liferay.portlet.imagegallery.model.IGImage;
-import com.liferay.portlet.imagegallery.service.IGFolderLocalServiceUtil;
-import com.liferay.portlet.imagegallery.service.IGImageLocalServiceUtil;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
@@ -20,14 +14,24 @@ import org.springframework.web.portlet.bind.annotation.ActionMapping;
 import org.springframework.web.portlet.bind.annotation.RenderMapping;
 import se.vgregion.mobile.CompanyExpandoService;
 import se.vgregion.mobile.icon.model.MobileIconPrefs;
-import se.vgregion.mobile.settings.controller.MobileSettingsController;
 import se.vgregion.mobile.settings.model.MobileIconStyle;
 
-import javax.portlet.*;
+import javax.portlet.ActionRequest;
+import javax.portlet.ActionResponse;
+import javax.portlet.PortletMode;
+import javax.portlet.PortletModeException;
+import javax.portlet.PortletRequest;
+import javax.portlet.ReadOnlyException;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
+import javax.portlet.ValidatorException;
+import javax.portlet.WindowStateException;
 import java.io.IOException;
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
 
 /**
  * User: pabe
@@ -70,42 +74,6 @@ public class MobileIconEditController implements Serializable {
         model.addAttribute("allCounterServices", result);
 
         return "edit";
-    }
-
-    @RenderMapping(params = {"action=editIconUrl"})
-    public String editIconUrl(RenderRequest request, Model model) throws SystemException {
-        ThemeDisplay themeDisplay = (ThemeDisplay) request.getAttribute(WebKeys.THEME_DISPLAY);
-        long portletGroupId = themeDisplay.getScopeGroupId();
-
-        List<IGFolder> folders = IGFolderLocalServiceUtil.getFolders(portletGroupId);
-
-        for (IGFolder folder : folders) {
-            if (folder.getName().equalsIgnoreCase("web content")) {
-                List<IGImage> images = IGImageLocalServiceUtil.getImages(portletGroupId, folder.getFolderId());
-                List<String> imageIds = new ArrayList<String>(images.size());
-                for (IGImage image : images) {
-                    imageIds.add(image.getSmallImageId() + "");
-                }
-                model.addAttribute("imageIds", imageIds);
-                break;
-            }
-        }
-
-        return "editIconUrl";
-    }
-
-    @ActionMapping(params = {"action=editIconUrl"})
-    public void editIconUrl(ActionRequest request, ActionResponse response, Model model) {
-        prefs.fromRequest(request);
-
-        response.setRenderParameter("action", "editIconUrl");
-    }
-
-    @ActionMapping(params = {"action=submitIconUrl"})
-    public void submitIconUrl(ActionRequest request, Model model) throws ReadOnlyException, ValidatorException,
-            IOException {
-        String imageId = request.getParameter("imageId");
-        prefs.setImageId(imageId);
     }
 
     @ActionMapping(params = {"action=save"})
