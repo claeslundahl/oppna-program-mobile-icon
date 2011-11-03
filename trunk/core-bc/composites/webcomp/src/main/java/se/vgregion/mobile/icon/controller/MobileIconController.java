@@ -47,10 +47,12 @@ public class MobileIconController {
         if ("url".equals(target)) {
             String targetUrl = prefs.getTargetUrl("");
             model.addAttribute("targetUrl", targetUrl);
+        } else if ("widgetUrl".equals(target)) {
+            String widgetUrl = prefs.getWidgetUrl();
+            model.addAttribute("widgetUrl", widgetUrl);
         }
 
         model.addAttribute("title", prefs.getTitle("untitled"));
-        model.addAttribute("imageId", prefs.getImageId());
 
         String counterService = prefs.getCounterService(null);
         if (counterService != null) {
@@ -101,23 +103,6 @@ public class MobileIconController {
             }
             return "-";
         }
-    }
-
-    @ActionMapping(params = "action=showWidget")
-    public void showWidget(ActionRequest request, ActionResponse response) throws WindowStateException {
-        response.setRenderParameter("action", "showWidget");
-        response.setRenderParameter("p_p_state", "exclusive");
-    }
-
-    @RenderMapping(params = "action=showWidget")
-    public String showWidget(RenderRequest request, RenderResponse response, Model model) {
-
-        MobileIconPrefs prefs = new MobileIconPrefs();
-        prefs.fromPreferences(request);
-
-        model.addAttribute("widgetScript", prefs.getWidgetScript(""));
-
-        return "widget";
     }
 
     private String lookupP3PInfo(PortletRequest req, PortletRequest.P3PUserInfos p3pInfo) {

@@ -2,9 +2,6 @@
 <%@ taglib prefix="portlet" uri="http://java.sun.com/portlet_2_0" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<portlet:actionURL var="showWidget">
-    <portlet:param name="action" value="showWidget"/>
-</portlet:actionURL>
 <portlet:resourceURL var="fetchCount" />
 
 <c:set var="appCssClass" value="${iconStyle}" scope="page" />
@@ -41,14 +38,18 @@
 
 <div class="${appCssClass}">
 
-    <c:set var="linkURL" value="${showWidget}" scope="page" />
-	<c:set var="targetVal" value="" scope="page" />
-	<c:if test="${target eq 'url'}">
-		<c:set var="linkURL" value="${targetUrl}" scope="page" />
-		<c:set var="targetVal" value="_BLANK" scope="page" />
+	<c:set var="targetVal" value="_BLANK" scope="page" />
+    <c:if test="${target eq 'url'}">
+        <c:set var="linkURL" value="${targetUrl}" scope="page" />
+    </c:if>
+
+    <c:set var="additionalClass" value="" scope="page" />
+    <c:if test="${target eq 'widgetUrl'}">
+		<c:set var="linkURL" value="${widgetUrl}" scope="page" />
+        <c:set var="additionalClass" value="widget-url" scope="page" />
 	</c:if>
-	
-	<a href="${linkURL}" target="${targetVal}" class="app-link">
+
+	<a href="${linkURL}" target="${targetVal}" class="app-link ${additionalClass}">
 	    <h1>
 	    	<c:set var="countCssClass" value="" scope="page" />
 	    	<c:if test="${count eq '-'}">
