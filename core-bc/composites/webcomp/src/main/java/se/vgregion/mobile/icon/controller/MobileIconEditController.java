@@ -1,20 +1,11 @@
 package se.vgregion.mobile.icon.controller;
 
-import com.liferay.portal.kernel.messaging.MessageBusUtil;
-import com.liferay.portal.kernel.portlet.LiferayWindowState;
-import com.liferay.portal.kernel.util.WebKeys;
-import com.liferay.portal.theme.ThemeDisplay;
-import com.liferay.portlet.expando.model.ExpandoColumn;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.portlet.bind.annotation.ActionMapping;
-import org.springframework.web.portlet.bind.annotation.RenderMapping;
-import se.vgregion.mobile.CompanyExpandoService;
-import se.vgregion.mobile.icon.model.MobileIconPrefs;
-import se.vgregion.mobile.settings.model.MobileIconStyle;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.TreeSet;
 
 import javax.portlet.ActionRequest;
 import javax.portlet.ActionResponse;
@@ -23,20 +14,29 @@ import javax.portlet.PortletModeException;
 import javax.portlet.PortletRequest;
 import javax.portlet.ReadOnlyException;
 import javax.portlet.RenderRequest;
-import javax.portlet.RenderResponse;
 import javax.portlet.ValidatorException;
 import javax.portlet.WindowStateException;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.TreeSet;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.portlet.bind.annotation.ActionMapping;
+import org.springframework.web.portlet.bind.annotation.RenderMapping;
+
+import se.vgregion.liferay.expando.CompanyExpandoHelper;
+import se.vgregion.mobile.icon.model.MobileIconPrefs;
+import se.vgregion.mobile.settings.model.MobileIconStyle;
+
+import com.liferay.portal.kernel.messaging.MessageBusUtil;
+import com.liferay.portal.kernel.portlet.LiferayWindowState;
+import com.liferay.portal.kernel.util.WebKeys;
+import com.liferay.portal.theme.ThemeDisplay;
+import com.liferay.portlet.expando.model.ExpandoColumn;
 
 /**
- * User: pabe
- * Date: 2011-07-25
- * Time: 11:27
+ * User: pabe Date: 2011-07-25 Time: 11:27
  */
 @Controller
 @RequestMapping(value = "EDIT")
@@ -44,9 +44,9 @@ import java.util.TreeSet;
 public class MobileIconEditController implements Serializable {
 
     @Autowired
-    private CompanyExpandoService companyExpandoService;
+    private CompanyExpandoHelper companyExpandoHelper;
 
-    private MobileIconPrefs prefs = new MobileIconPrefs();
+    private final MobileIconPrefs prefs = new MobileIconPrefs();
 
     @RenderMapping
     public String edit(RenderRequest request, Model model) {
@@ -56,10 +56,10 @@ public class MobileIconEditController implements Serializable {
 
         long companyId = lookupCompanyId(request);
         List<String> allIconStyles = new ArrayList<String>();
-        List<ExpandoColumn> expandoColumns = companyExpandoService.getAllKeys(companyId);
-        for (ExpandoColumn col: expandoColumns) {
+        List<ExpandoColumn> expandoColumns = companyExpandoHelper.getAll(companyId);
+        for (ExpandoColumn col : expandoColumns) {
             if (col.getName().startsWith(MobileIconStyle.PREFIX)) {
-                allIconStyles.add(companyExpandoService.getSetting(col.getName(), companyId));
+                allIconStyles.add(companyExpandoHelper.get(col.getName(), companyId));
             }
         }
         model.addAttribute("allIconStyles", allIconStyles);
@@ -76,7 +76,7 @@ public class MobileIconEditController implements Serializable {
         return "edit";
     }
 
-    @ActionMapping(params = {"action=save"})
+    @ActionMapping(params = { "action=save" })
     public void save(ActionRequest request, ActionResponse response) throws ReadOnlyException, ValidatorException,
             IOException, PortletModeException, WindowStateException {
         prefs.fromRequest(request);
@@ -87,7 +87,7 @@ public class MobileIconEditController implements Serializable {
         response.setWindowState(LiferayWindowState.NORMAL);
     }
 
-    @ActionMapping(params = {"action=cancel"})
+    @ActionMapping(params = { "action=cancel" })
     public void cancel(ActionResponse response) throws PortletModeException, WindowStateException {
         prefs.resetFields();
 

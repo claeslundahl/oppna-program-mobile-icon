@@ -1,5 +1,33 @@
 package se.vgregion.mobile.settings.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import javax.portlet.ActionRequest;
+import javax.portlet.PortletRequest;
+import javax.portlet.RenderRequest;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.portlet.bind.annotation.ActionMapping;
+import org.springframework.web.portlet.bind.annotation.RenderMapping;
+
+import se.vgregion.liferay.expando.CommunityExpandoHelper;
+import se.vgregion.liferay.expando.CompanyExpandoHelper;
+import se.vgregion.mobile.settings.model.MobileArticle;
+import se.vgregion.mobile.settings.model.MobileIconStyle;
+import se.vgregion.mobile.settings.model.MobilePage;
+
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.model.Group;
@@ -14,48 +42,26 @@ import com.liferay.portlet.journal.model.JournalTemplate;
 import com.liferay.portlet.journal.service.JournalArticleLocalService;
 import com.liferay.portlet.journal.service.JournalStructureLocalService;
 import com.liferay.portlet.journal.service.JournalTemplateLocalService;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.portlet.bind.annotation.ActionMapping;
-import org.springframework.web.portlet.bind.annotation.RenderMapping;
-import se.vgregion.mobile.CommunityExpandoService;
-import se.vgregion.mobile.CompanyExpandoService;
-import se.vgregion.mobile.settings.model.MobileArticle;
-import se.vgregion.mobile.settings.model.MobileIconStyle;
-import se.vgregion.mobile.settings.model.MobilePage;
-
-import javax.portlet.ActionRequest;
-import javax.portlet.PortletRequest;
-import javax.portlet.RenderRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
- * Created by IntelliJ IDEA.
- * User: david
- * Date: 28/9-11
- * Time: 20:53
+ * Created by IntelliJ IDEA. User: david Date: 28/9-11 Time: 20:53
  */
 @Controller
 @RequestMapping("VIEW")
 public class MobileSettingsController {
     private static final Logger LOGGER = LoggerFactory.getLogger(MobileSettingsController.class);
 
-    @Autowired
-    private CompanyExpandoService companyExpandoService;
+    // @Autowired
+    // private companyExpandoHelper companyExpandoHelper;
+    //
+    // @Autowired
+    // private communityExpandoHelper communityExpandoHelper;
 
     @Autowired
-    private CommunityExpandoService communityExpandoService;
+    private CompanyExpandoHelper companyExpandoHelper;
+
+    @Autowired
+    private CommunityExpandoHelper communityExpandoHelper;
 
     @Autowired
     private LayoutLocalService layoutLocalService;
@@ -102,7 +108,8 @@ public class MobileSettingsController {
 
         MobileArticle workArticle = lookupMobileArticle(companyId, languageId, groupId, MobileArticle.PREFIX + "1");
         model.addAttribute("workArticle", workArticle);
-        MobileArticle searchArticle = lookupMobileArticle(companyId, languageId, groupId, MobileArticle.PREFIX + "2");
+        MobileArticle searchArticle = lookupMobileArticle(companyId, languageId, groupId, MobileArticle.PREFIX
+                + "2");
         model.addAttribute("searchArticle", searchArticle);
         MobileArticle userArticle = lookupMobileArticle(companyId, languageId, groupId, MobileArticle.PREFIX + "3");
         model.addAttribute("userArticle", userArticle);
@@ -113,7 +120,7 @@ public class MobileSettingsController {
     private MobileArticle lookupMobileArticle(long companyId, String languageId, Long groupId, String expandoKey) {
         MobileArticle article = new MobileArticle(expandoKey);
         try {
-            String articleId = communityExpandoService.getStringSetting(expandoKey, companyId, groupId);
+            String articleId = communityExpandoHelper.get(expandoKey, companyId, groupId);
 
             if (articleId != null) {
                 JournalArticle journalArticle = journalArticleLocalService.getLatestArticle(groupId, articleId);
@@ -130,8 +137,7 @@ public class MobileSettingsController {
 
                 String tempaleId = journalArticle.getTemplateId();
                 if (StringUtils.isNotBlank(structureId)) {
-                    JournalTemplate journalTemplate = journalTemplateLocalService.getTemplate(groupId,
-                            tempaleId);
+                    JournalTemplate journalTemplate = journalTemplateLocalService.getTemplate(groupId, tempaleId);
                     article.setTemplateName(journalTemplate.getName());
                 }
             }
@@ -145,7 +151,7 @@ public class MobileSettingsController {
     private MobilePage lookupMobileStartPage(long companyId, String languageId, Long groupId) {
         MobilePage startPage = new MobilePage(MobilePage.MOBILE_START_PAGE_KEY);
         try {
-            Long layoutId = communityExpandoService.getLongSetting(MobilePage.MOBILE_START_PAGE_KEY, companyId, groupId);
+            Long layoutId = communityExpandoHelper.get(MobilePage.MOBILE_START_PAGE_KEY, companyId, groupId);
             if (layoutId != null) {
                 Layout layout = layoutLocalService.getLayout(groupId, true, layoutId);
                 startPage.setLayoutId(layoutId);
@@ -162,7 +168,7 @@ public class MobileSettingsController {
     private MobilePage lookupMobileLoginPage(long companyId, String languageId, Long groupId) {
         MobilePage loginPage = new MobilePage(MobilePage.MOBILE_LOGIN_PAGE_KEY);
         try {
-            Long layoutId = communityExpandoService.getLongSetting(MobilePage.MOBILE_LOGIN_PAGE_KEY, companyId, groupId);
+            Long layoutId = communityExpandoHelper.get(MobilePage.MOBILE_LOGIN_PAGE_KEY, companyId, groupId);
             if (layoutId != null) {
                 Layout layout = layoutLocalService.getLayout(groupId, true, layoutId);
                 loginPage.setLayoutId(layoutId);
@@ -183,8 +189,8 @@ public class MobileSettingsController {
             try {
                 layouts = layoutLocalService.getLayouts(groupId, true, 0L);
             } catch (SystemException e) {
-                LOGGER.error("Failed to find layouts in community [" + communityName + "] - Mobile startpage cannot be " +
-                        "configured");
+                LOGGER.error("Failed to find layouts in community [" + communityName
+                        + "] - Mobile startpage cannot be " + "configured");
             }
             if (layouts != null) {
                 for (Layout layout : layouts) {
@@ -205,9 +211,8 @@ public class MobileSettingsController {
             try {
                 layouts = layoutLocalService.getLayouts(groupId, false, 0L);
             } catch (SystemException e) {
-                LOGGER.error("Failed to find layouts in community [" + communityName + "] - Mobile loginpage cannot " +
-                        "be " +
-                        "configured");
+                LOGGER.error("Failed to find layouts in community [" + communityName
+                        + "] - Mobile loginpage cannot " + "be " + "configured");
             }
             if (layouts != null) {
                 for (Layout layout : layouts) {
@@ -223,11 +228,11 @@ public class MobileSettingsController {
 
     private List<MobileIconStyle> lookupMobileIconStyles(long companyId) {
         List<MobileIconStyle> mobileIconStyles = new ArrayList<MobileIconStyle>();
-        List<ExpandoColumn> companyExpandoColumns = companyExpandoService.getAllKeys(companyId);
+        List<ExpandoColumn> companyExpandoColumns = companyExpandoHelper.getAll(companyId);
         for (ExpandoColumn expandoColumn : companyExpandoColumns) {
             if (expandoColumn.getName().startsWith(MobileIconStyle.PREFIX)) {
                 String key = expandoColumn.getName();
-                String value = companyExpandoService.getSetting(key, companyId);
+                String value = companyExpandoHelper.get(key, companyId);
 
                 mobileIconStyles.add(new MobileIconStyle(key, value));
             }
@@ -237,14 +242,13 @@ public class MobileSettingsController {
 
     @RenderMapping(params = "action=edit")
     public String editExpandoValue(RenderRequest request,
-            @RequestParam(required = false, value = "expandoKey") String expandoKey,
-            Model model) {
+            @RequestParam(required = false, value = "expandoKey") String expandoKey, Model model) {
         MobileIconStyle mobileIconStyle = null;
         if (expandoKey == null) {
             mobileIconStyle = new MobileIconStyle(MobileIconStyle.PREFIX, "");
         } else {
             long companyId = lookupCompanyId(request);
-            String value = companyExpandoService.getSetting(expandoKey, companyId);
+            String value = companyExpandoHelper.get(expandoKey, companyId);
             mobileIconStyle = new MobileIconStyle(expandoKey, value);
         }
 
@@ -255,12 +259,11 @@ public class MobileSettingsController {
     }
 
     @ActionMapping("saveMobileIconStyle")
-    public void saveMobileIconStyle(ActionRequest request,
-            @ModelAttribute MobileIconStyle mobileIconStyle,
+    public void saveMobileIconStyle(ActionRequest request, @ModelAttribute MobileIconStyle mobileIconStyle,
             Model model) {
         try {
             long companyId = lookupCompanyId(request);
-            companyExpandoService.setSetting(mobileIconStyle.getKey(), mobileIconStyle.getValue(), companyId);
+            companyExpandoHelper.set(mobileIconStyle.getKey(), mobileIconStyle.getValue(), companyId);
 
             model.addAttribute("saveAction", mobileIconStyle.getKey());
         } catch (Exception ex) {
@@ -270,14 +273,11 @@ public class MobileSettingsController {
     }
 
     @ActionMapping("saveMobilePage")
-    public void saveMobileStartPage(ActionRequest request,
-            @ModelAttribute MobilePage mobilePage, Model model) {
+    public void saveMobileStartPage(ActionRequest request, @ModelAttribute MobilePage mobilePage, Model model) {
         try {
             long companyId = lookupCompanyId(request);
             long groupId = lookupGroupId(request);
-            communityExpandoService.setSetting(mobilePage.getExpandoKey()
-                    , mobilePage.getLayoutId()
-                    , companyId, groupId);
+            communityExpandoHelper.set(mobilePage.getExpandoKey(), mobilePage.getLayoutId(), companyId, groupId);
 
             model.addAttribute("saveActionPage", mobilePage.getExpandoKey());
         } catch (Exception ex) {
@@ -287,14 +287,12 @@ public class MobileSettingsController {
     }
 
     @ActionMapping("saveMobileArticle")
-    public void saveMobileArticle(ActionRequest request,
-            @ModelAttribute MobileArticle mobileArticle, Model model) {
+    public void saveMobileArticle(ActionRequest request, @ModelAttribute MobileArticle mobileArticle, Model model) {
         try {
             long companyId = lookupCompanyId(request);
             long groupId = lookupGroupId(request);
-            communityExpandoService.setSetting(mobileArticle.getExpandoKey()
-                    , mobileArticle.getArticleId()
-                    , companyId, groupId);
+            communityExpandoHelper.set(mobileArticle.getExpandoKey(), mobileArticle.getArticleId(), companyId,
+                    groupId);
 
             model.addAttribute("saveActionArticle", mobileArticle.getExpandoKey());
         } catch (Exception ex) {
@@ -308,7 +306,7 @@ public class MobileSettingsController {
             Model model) {
         try {
             long companyId = lookupCompanyId(request);
-            companyExpandoService.delete(companyId, expandoKey);
+            companyExpandoHelper.delete(companyId, expandoKey);
 
             model.addAttribute("removeAction", expandoKey);
         } catch (Exception ex) {
@@ -332,7 +330,8 @@ public class MobileSettingsController {
             community = groupLocalService.getGroup(lookupCompanyId(request), communityName);
             return community.getGroupId();
         } catch (Exception e) {
-            LOGGER.error("Could not find community [" + communityName + "] - Mobile startpage cannot be configured");
+            LOGGER.error("Could not find community [" + communityName
+                    + "] - Mobile startpage cannot be configured");
         }
         return null;
     }
@@ -343,8 +342,8 @@ public class MobileSettingsController {
             community = groupLocalService.getGroup(lookupCompanyId(request), publicCommunityName);
             return community.getGroupId();
         } catch (Exception e) {
-            LOGGER.error("Could not find community [" + publicCommunityName + "] - Mobile loginpage cannot be " +
-                    "configured");
+            LOGGER.error("Could not find community [" + publicCommunityName + "] - Mobile loginpage cannot be "
+                    + "configured");
         }
         return null;
     }
