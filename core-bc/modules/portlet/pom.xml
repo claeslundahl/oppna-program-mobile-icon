@@ -34,13 +34,6 @@ Generation time : 2011-07-25 09:05:40 CEST
     </plugins>
   </build>
 
-  <repositories>
-    <repository>
-      <id>asdf</id>
-      <url>http://repos.zeroturnaround.com/maven2</url>
-    </repository>
-  </repositories>
-
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>

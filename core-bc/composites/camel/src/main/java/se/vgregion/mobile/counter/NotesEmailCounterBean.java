@@ -17,8 +17,8 @@ import org.apache.http.protocol.HttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import se.vgregion.portal.csiframe.domain.UserSiteCredential;
-import se.vgregion.portal.csiframe.service.UserSiteCredentialService;
+import se.vgregion.portal.cs.domain.UserSiteCredential;
+import se.vgregion.portal.cs.service.CredentialService;
 
 import java.io.IOException;
 import java.net.URI;
@@ -36,7 +36,7 @@ public class NotesEmailCounterBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(NotesEmailCounterBean.class);
 
     @Autowired
-    private UserSiteCredentialService credentialService;
+    private CredentialService credentialService;
 
     public String getCount(final String userId) throws IOException, URISyntaxException {
         if (userId == null) {
@@ -145,5 +145,4 @@ public class NotesEmailCounterBean {
             }
         }
     }
-
 }
