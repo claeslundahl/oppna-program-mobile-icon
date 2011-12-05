@@ -3,8 +3,22 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
 
   <bean id="communityExpandoHelper" class="se.vgregion.liferay.expando.CommunityExpandoHelperImpl" />
+
+  <bean id="expandoColumnLocalService" class="com.liferay.portlet.expando.service.ExpandoColumnLocalServiceUtil"
+    factory-method="getService" />
+
+  <bean id="expandoValueLocalService" class="com.liferay.portlet.expando.service.ExpandoValueLocalServiceUtil"
+    factory-method="getService" />
+    
+   <bean id="roleLocalService" class="com.liferay.portal.service.RoleLocalServiceUtil" factory-method="getService" />
+   
+   <bean id="resourcePermissionLocalService" class="com.liferay.portal.service.ResourcePermissionLocalServiceUtil" factory-method="getService" />
+
+  <bean id="expandoTableLocalService" class="com.liferay.portlet.expando.service.ExpandoTableLocalServiceUtil"
+    factory-method="getService" />
+
   <bean id="companyExpandoHelper" class="se.vgregion.liferay.expando.CompanyExpandoHelperImpl" />
-  
+
   <bean id="expandoUtil" class="se.vgregion.liferay.expando.ExpandoUtil" />
 
   <bean id="layoutLocalService" class="com.liferay.portal.service.LayoutLocalServiceUtil" factory-method="getService" />
