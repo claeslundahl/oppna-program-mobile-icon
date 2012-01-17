@@ -16,20 +16,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mobile-icon-core-bc-composite-svc</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>mobile-icon-core-bc-composite-types</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
       <groupId>se.vgregion.commons-util</groupId>
       <artifactId>commons-util-core-bc-composite-svc-liferay</artifactId>
-      <version>3.8-SNAPSHOT</version>
+      <version>3.8</version>
     </dependency>
 
     <dependency>
